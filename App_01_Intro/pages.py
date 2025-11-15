@@ -8,7 +8,13 @@ class P1_Consent(Page):
     form_model = 'player'
     form_fields = ['consent']
 
-def before_next_page(self, timeout_happened): 
+    def vars_for_template(self):
+        # creating_session で保存した 'condition' 変数を取得する
+        condition = self.participant.vars.get('condition')
+        # テンプレート（P1_Consent.html）に渡す
+        return {'debug_condition': condition}
+    
+    def before_next_page(self, timeout_happened): 
         # timeout_happened が使われない場合でも定義は必要
         if not self.player.consent:
             self.participant.vars['consent_rejected'] = True
@@ -55,3 +61,13 @@ class P6_RoleAssignmentWait(Page):
 
     def is_displayed(self):
         return self.participant.vars.get('consent_rejected') is None
+
+# --- ページ遷移の定義 ---
+page_sequence = [
+    P1_Consent,
+    P2_MatchingWait,
+    P3_GroupFormation,
+    P4_RoleInstruction,
+    P5_RewardInstruction,
+    P6_RoleAssignmentWait,
+]

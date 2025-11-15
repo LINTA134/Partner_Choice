@@ -37,10 +37,10 @@ LANGUAGE_CODE = 'ja'
 REAL_WORLD_CURRENCY_CODE = 'JPY'
 USE_POINTS = True
 
-ADMIN_USERNAME = 'admin'
+ADMIN_USERNAME = environ.get('OTREE_ADMIN_USERNAME', 'admin')
 # for security, best to set admin password in an environment variable
-ADMIN_PASSWORD = environ.get('OTREE_ADMIN_PASSWORD')
+ADMIN_PASSWORD = environ.get('OTREE_ADMIN_PASSWORD', '32c2e8cf2ac9fdfe1e063f2b16d1fe54')
 
 DEMO_PAGE_INTRO_HTML = """ """
 
-SECRET_KEY = '1647361268177'
+SECRET_KEY = environ.get('OTREE_SECRET_KEY', '1647361268177')

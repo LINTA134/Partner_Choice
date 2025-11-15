@@ -1,5 +1,4 @@
-from otree.api import Page
-from ._builtin import next_page
+from otree.api import Pages
 from .models import Constants, Player, Currency as c
 
 # ----------------------------------------

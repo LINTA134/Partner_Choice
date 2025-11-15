@@ -1,5 +1,4 @@
 from otree.api import Page
-from ._builtin import next_page
 from .models import Constants, Player
 
 # ----------------------------------------
