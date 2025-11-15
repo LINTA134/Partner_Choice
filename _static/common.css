@@ -1,0 +1,716 @@
+/* === common.css (共通スタイルシート) === */
+
+/* --- 1. 全体の設定 --- */
+body {
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+  background-color: #F9F9F9;
+  color: #454545;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.experiment-container {
+  width: 100%;
+  max-width: 800px;
+  border: 1px solid #E0E0E0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #FFFFFF;
+  margin-bottom: 16px;
+}
+
+.icon-svg {
+  width: 0;
+  height: 0;
+  position: absolute;
+  display: none;
+}
+
+/* --- 2. 進捗インジケーター --- */
+.progress-tabs {
+  display: flex;
+  background-color: #F9F9F9;
+  border-bottom: 1px solid #E0E0E0;
+}
+.progress-tabs .tab-button {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 0.9em;
+  font-weight: bold;
+  text-align: center;
+  color: #454545;
+  background-color: #E0E0E0;
+  border-bottom: 2px solid #E0E0E0;
+  cursor: pointer;
+}
+.progress-tabs .tab-button.active {
+  color: #3B95C4; background-color: #FFFFFF;
+  border-bottom: 2px solid #3B95C4;
+}
+.progress-content {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #E0E0E0;
+  overflow: auto;
+}
+.progress-steps {
+  display: none;
+  justify-content: space-around;
+  padding: 16px 12px;
+}
+.progress-steps.active { display: flex; }
+.progress-steps .step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #E0E0E0;
+  font-weight: bold;
+  font-size: 0.8em;
+  flex: 1;
+  text-align: center;
+  min-width:60px;
+}
+.progress-steps .step .step-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color:#E0E0E0;
+  color: #FFFFFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+.progress-steps .step.completed { color: #454545; }
+.progress-steps .step.completed .step-number { background-color: #454545; }
+.progress-steps .step.current { color: #3B95C4; }
+.progress-steps .step.current .step-number { background-color: #3B95C4; }
+
+/* --- 3. ヘッダー (「全体ルーム」Active版) --- */
+.experiment-header {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 0 16px 0 0; 
+  border-bottom: 2px solid #E0E0E0;
+  background-color: #F9F9F9;
+}
+.room-tabs { display: flex; }
+.room-tabs div {
+  padding: 12px 20px;
+  background-color: #E0E0E0;
+  color: #454545;
+  font-weight: bold;
+  border-right: 1px solid #FFFFFF;
+}
+.room-tabs .active {
+  background-color: #FFFFFF;
+  color: #000000;
+  border-bottom: 2px solid #FFFFFF;
+  margin-bottom: -2px;
+}
+.header-right-panel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.rule-check-button {
+  display: block; 
+  padding: 6px 12px; font-size: 0.9em; font-weight: bold;
+  border-radius: 5px; border: 1px solid #E0E0E0;
+  background-color: #FFFFFF; color: #454545; cursor: pointer;
+}
+.rule-check-button:hover { background-color: #F4F4F4; }
+.user-profile {
+  display: flex; align-items: center; gap: 8px;
+}
+.user-profile .icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; justify-content: center; align-items: center;
+}
+.user-profile .icon svg {
+  width: 60%; height: 60%; fill: #454545;
+}
+.user-profile .name { font-weight: bold; color: #454545; }
+.icon-user { background-color: #B560D4; }
+
+/* --- 4. ページ本体 (基本スタイル) --- */
+.content-area {
+  padding: 32px;
+  line-height: 1.7;
+}
+.content-area h2 {
+  font-size: 1.5em;
+  color: #000000;
+  border-bottom: 2px solid #E0E0E0;
+  padding-bottom: 12px;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+.content-area p {
+  margin-bottom: 16px;
+  font-size: 1.0em;
+}
+
+.rule-box {
+  padding: 16px 24px;
+  margin: 24px 0;
+  border-radius: 8px;  
+  border: 1px solid #E0E0E0;
+  background-color: #F9F9F9;
+}
+.rule-box h3 {
+  font-size: 1.2em;
+  color: #000000;
+  margin-top: 0;
+  margin-bottom: 16px;
+  text-align: center;
+}
+ .rule-box h4 {
+  font-size: 1.0em;
+  color: #454545;
+  margin-top: 16px;
+  margin-bottom: 0px;
+}
+.rule-box p {
+  font-size: 1.0em;
+  margin-bottom: 12px;
+}
+.rule-image-container {
+  display: flex; 
+  text-align: center;
+  margin: 20px 0;
+  padding: 16px;
+  background-color: #F9F9F9; /* 画像の背景を白に */
+  border-radius: 4px;
+  justify-content: space-around;
+}
+.rule-image-container img {
+  max-width: 40%;
+  height: auto;
+}
+
+/* メンバーアイコン共通スタイル */
+.icon-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* 中央揃え */
+  gap: 20px;
+}
+
+.profile-card {
+  width: 120px; /* 幅を固定 */
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  background-color: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.profile-card .name {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+}
+
+.profile-card .icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  margin: 0 auto 8px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-card .icon svg {
+  width: 60%; height: 60%;
+  fill: #454545;
+}
+
+.icon-a { background-color: #F81B02; } /* レッドさん (A) */
+.icon-b { background-color: #50C49F; } /* シアンさん (B) */
+.icon-c { background-color: #AFBF41; } /* グリーンさん (C) */
+.icon-x { background-color: #FC7715; } /* オレンジさん (X) */
+.icon-user { background-color: #B560D4; } /* あなた (参加者) */
+.icon-null { background-color: #E0E0E0; }
+.icon-practice-receiver { /* P12, P11 練習相手 */
+  background-color: #FFFFFF;
+  border: 2px solid #E0E0E0;
+}
+
+
+/* --- 6. シミュレーション共通スタイル --- */
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.slider-container input[type="range"] {
+  flex: 1;
+  margin: 0;
+}
+.slider-container span.slider-value {
+  font-weight: bold;
+  font-size: 1.1em;
+  width: 40px;
+  text-align: right;
+}
+.card-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 32px 0;
+}
+.card-visual .arrow {
+  font-size: 2.5em;
+  color: #E0E0E0;
+  font-weight: bold;
+}
+.card-visual .profile-card {
+  padding: 12px;
+  width: 140px
+}
+.card-visual .profile-card .name {
+  font-size: 1.0em;
+  white-space: nowrap;
+}
+.card-visual .profile-card .icon {
+  width: 50px;
+  height: 50px;
+}
+
+.sim-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E0E0E0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  box-sizing: border-box;
+}
+.sim-card-header {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #000000;
+  text-align: center;
+  border-bottom: 2px solid #F0F0F0;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+.sim-card-input {
+  margin: 24px 0;
+}
+.sim-card-footer {
+  /* P11 (カードデッキUI) の「決定」ボタン用フッター */
+  text-align: right;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #F0F0F0;
+}
+
+.sim-result {
+  /* display: none; JSで表示制御 */
+  text-align: center;
+}
+
+.sim-summary-box {
+  padding: 16px 24px;
+  background-color: #F9F9F9;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  margin: 24px 0; /* 上下のマージンを統一 */
+}
+.sim-summary-box h3 {
+  font-size: 1.2em;
+  color: #000000;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.sim-result p { 
+  font-size: 1.1em; 
+  font-weight: bold; 
+  line-height: 1.7; 
+}
+.sim-result span.calc-value { 
+  font-weight: bold; 
+  color: #3B95C4; 
+  font-size: 1.2em; 
+}
+
+
+
+
+/* --- 5. ナビゲーションボタン (基本スタイル) --- */
+.navigation-footer {
+  display: flex;
+  justify-content: flex-end; /* 基本は右寄せ */
+  padding: 24px 32px;
+  border-top: 1px solid #E0E0E0;
+  background-color: #F9F9F9;
+}
+.btn {
+  padding: 12px 24px;
+  font-size: 1em;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary { background-color: #3B95C4; color: #FFFFFF; }
+.btn-primary:hover { background-color: #307FAA; }
+.btn-primary:disabled {
+  background-color: #A0A0A0;
+  color: #FFFFFF;
+  cursor: not-allowed;
+}
+
+/* ★ P11, P12 リセットボタン用 (新規追加/移設) */
+.btn-secondary {
+  background-color: #F0F0F0;
+  color: #454545;
+  border: 1px solid #E0E0E0;
+  font-size: 0.9em;
+  padding: 8px 16px;
+}
+.btn-secondary:hover {
+  background-color: #E0E0E0;
+}
+
+
+/* --- 6. 中断用フッター --- */
+.experiment-footer {
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+  padding: 12px;
+  font-size: 0.9em;
+}
+.experiment-footer a {
+  color: #757575;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* --- 7. ルール確認ポップアップ (モーダル) --- */
+.modal-overlay {
+  display: none;
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  justify-content: center; align-items: center;
+}
+.modal-content {
+  background-color: #FFFFFF; border-radius: 8px;
+  width: 90%; max-width: 700px;
+  max-height: 80vh; overflow-y: auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+.modal-header {
+  padding: 16px 24px; border-bottom: 1px solid #E0E0E0;
+  font-size: 1.2em; font-weight: bold;
+  display: flex; justify-content: space-between;
+  align-items: center;
+}
+.modal-body { padding: 24px; line-height: 1.6; }
+.close-button {
+  font-size: 1.5em; font-weight: bold; color: #757575;
+  cursor: pointer; border: none; background: none;
+}
+
+/* P2: ローディングスピナー */
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #E0E0E0;
+  border-bottom-color: #3B95C4;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  margin: 24px;
+}
+@keyframes rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* P2: 完了メッセージ (最初は非表示) */
+#completion-message {
+  display: none;
+  color: #000000;
+}
+
+
+/* === 8. 汎用アニメーション (P11 カードデッキ用) === */
+
+/* 左へスライドアウト */
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0) rotate(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-120%) rotate(-10deg); /* 少し回転させながら */
+    opacity: 0;
+  }
+}
+.slide-out-left {
+  animation: slide-out-left 0.6s ease-in-out forwards;
+}
+
+/* === 9. 汎用カードデッキUI (P11用) === */
+
+.deck-card {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  backface-visibility: hidden; /* チラツキ防止 */
+  
+  /* カードを重ねるための初期設定 */
+  transform-origin: center bottom;
+  opacity: 0; /* 最初は非表示 */
+}
+
+/* 2番目以降のカードを少しずらして重ねる */
+/* JSが .is-active, .is-next, .is-stacked を制御する */
+.deck-card.is-stacked {
+  transform: translateY(-20px) scale(0.95);
+  opacity: 0.5;
+  pointer-events: none;
+}
+.deck-card.is-next {
+  transform: translateY(-10px) scale(0.98);
+  opacity: 1;
+  pointer-events: none;
+}
+.deck-card.is-active {
+  transform: translateY(0) scale(1.0);
+  opacity: 1;
+  pointer-events: auto; /* クリック可能に */
+  z-index: 10;
+}
+
+/* アニメーションで消えたカード */
+.deck-card.is-gone {
+  transform: translateX(-120%) rotate(-10deg);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1; /* z-indexを下げておく */
+}
+
+
+/* === 13. ★ 新規追加: P14 ドラッグ＆ドロップ 汎用スタイル === */
+
+/* ドラッグ可能なアイテム */
+.draggable {
+  cursor: grab;
+  user-select: none; /* テキスト選択を防ぐ */
+}
+/* ドラッグ中のアイテムのスタイル */
+.is-dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2); /* 持ち上げている演出 */
+}
+
+/* ドロップ先のゾーン */
+.dropzone {
+  border: 2px dashed #E0E0E0;
+  border-radius: 8px;
+  background-color: #F9F9F9;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+/* ドロップゾーンにアイテムが入った時のスタイル */
+.dropzone.is-filled {
+  border-style: solid;
+  background-color: #FFFFFF;
+}
+/* ドラッグ中のアイテムが上に来た時のスタイル */
+.dropzone.is-over {
+  background-color: #E0F7FA; /* 明るい青 */
+  border-color: #3B95C4;
+  border-style: solid;
+}
+
+/* 質問項目 (Q+A) の基本ブロック */
+.question-block {
+  margin-bottom: 24px;
+  padding: 24px;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  background-color: #FFFFFF;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+/* 必須回答エラー時のスタイル */
+.question-block.question-error {
+  border-color: #D9534F; /* エラー赤 */
+  box-shadow: 0 0 8px rgba(217, 83, 79, 0.3);
+}
+/* 質問文のラベル */
+.question-label {
+  display: block;
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #000000;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+/* 質問文の補足 */
+.question-label .question-note {
+  display: block;
+  font-size: 0.9em;
+  font-weight: normal;
+  color: #454545;
+  margin-top: 4px;
+}
+/* 質問の回答欄（リッカートや名義尺度）のコンテナ */
+.question-body {
+  padding: 0 8px;
+}
+/* 質問ブロック内の小見出し (例: Q3-1) */
+.question-label-sub {
+  display: block;
+  font-weight: bold;
+  font-size: 1.0em;
+  color: #454545;
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+.question-label-sub:first-child {
+  margin-top: 0;
+}
+
+/* 7段階リッカート尺度 */
+.likert-scale-7 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+}
+.likert-scale-7 .likert-label-left,
+.likert-scale-7 .likert-label-right {
+  font-size: 0.9em;
+  color: #454545;
+  width: 120px; /* 両端のラベル幅を固定 */
+}
+.likert-scale-7 .likert-label-left { text-align: left; }
+.likert-scale-7 .likert-label-right { text-align: right; }
+
+/* リッカート尺度のラジオボタン本体は隠す */
+.likert-scale-7 input[type="radio"] {
+  display: none;
+}
+/* クリック可能なラベル（数字） */
+.likert-scale-7 label {
+  flex: 1;
+  max-width: 44px;
+  text-align: center;
+}
+.likert-scale-7 label span {
+  display: block;
+  width: 36px;
+  height: 36px;
+  line-height: 34px;
+  border: 1px solid #E0E0E0;
+  border-radius: 50%; /* 円形 */
+  background-color: #FFFFFF;
+  color: #454545;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  margin: 0 auto; /* 中央揃え */
+}
+/* ホバー時 */
+.likert-scale-7 label:hover span {
+  background-color: #F0F0F0;
+  border-color: #3B95C4;
+}
+/* 選択時 (★重要) */
+.likert-scale-7 input[type="radio"]:checked + span {
+  background-color: #3B95C4; /* プライマリ色 */
+  color: #FFFFFF;
+  border-color: #3B95C4;
+  font-weight: bold;
+}
+
+/* 名義尺度 (縦並びラジオボタン) */
+.nominal-scale {
+  padding: 8px 0;
+}
+.nominal-scale label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 1.0em;
+  cursor: pointer;
+}
+.nominal-scale label input[type="radio"] {
+  margin-right: 8px;
+  /* (ブラウザ標準のラジオボタンを使用) */
+}
+
+/* === 13. ★ 新規追加: ゴシップ（吹き出し）UI (P13から移動) === */
+.member-profile-container {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 32px 0;
+}
+
+
+
+.gossip-illustrator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+  /* (P13にあったスタイルをそのまま流用) */
+}
+/* CSS 吹き出し */
+.speech-bubble {
+  position: relative;
+  background: #F0F0F0;
+  border-radius: .4em;
+  padding: 12px 16px;
+  color: #000000;
+  font-weight: bold;
+  max-width: 350px;
+}
+/* 吹き出しの「しっぽ」 */
+.speech-bubble:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-right-color: #F0F0F0;
+  border-left: 0;
+  margin-top: -10px;
+  margin-left: -10px;
+}
+
+/* === 14. ★ 新規追加: 汎用ユーティリティクラス === */
+
+/* JSによる表示/非表示制御 */
+.hidden {
+  display: none !important;
+}
+
+/* グレーアウト (情報開示前) */
+.is-dimmed {
+  opacity: 0.4;
+  transition: opacity 0.3s ease-in-out;
+}

@@ -1,0 +1,202 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{# --- 共通CSS/JSの読み込み --- #}
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+  {# 21. 事後アンケート.html からエラーメッセージ用スタイルを拝借 #}
+  <style>
+    #validation-error-message {
+      color: #D9534F;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 16px;
+      display: none;
+    }
+  </style>
+{% endblock %}
+
+{# --- ページのタイトル --- #}
+{% block title %}
+  タスク３：事後アンケート
+{% endblock %}
+
+{# --- ページのメインコンテンツ --- #}
+{% block content %}
+
+  <svg class="icon-svg">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+
+
+  <div class="experiment-container">
+    
+    <div class="progress-tabs">
+      <div class="tab-button active" id="tab-role2">あなたの進捗</div>
+      <div class="tab-button" id="tab-role1">他メンバーの進捗</div>
+    </div>
+
+    <div class="progress-content">
+      <div class="progress-steps active" id="steps-role2">
+        <div class="step completed"><div class="step-number">1</div>同意取得</div>
+        <div class="step completed"><div class="step-number">2</div>実験概要説明</div>
+        <div class="step completed"><div class="step-number">3</div>タスク１説明</div>
+        <div class="step completed"><div class="step-number">4</div>タスク２説明</div>
+        <div class="step current"><div class="step-number">5</div>アンケート</div>
+        <div class="step"><div class="step-number">6</div>報酬の確認</div>
+      </div>
+    </div>
+    
+    <div class="experiment-header">
+      <div class="room-tabs">
+        <div>作業ルーム1</div>
+        <div>作業ルーム2</div>
+        <div class="active">全体ルーム</div> 
+      </div>
+      <div class="header-right-panel">
+        <button type="button" class="rule-check-button" id="open-rules-modal">
+          ルールを確認する
+        </button>
+        <div class="user-profile">
+          <div class="icon icon-user">
+            <svg><use xlink:href="#icon-person"></use></svg>
+          </div>
+          <span class="name">あなた</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <h2 id="page-title">タスク３：事後アンケート (1/2)</h2>
+      <p>
+        最後に、いくつかのご質問にお答えください。<br>
+        すべての質問項目は必須回答となります。
+      </p>
+
+      <div class="question-block" id="q-dv1">
+        <label class="question-label" for="dv1-slider">
+          Q1. あなたは実際、X が贈り物ゲームでどれだけの額を相手に分配したと思いますか？ (0〜100ptの範囲で推測してください)
+        </label>
+        <div class="question-body">
+          <div class="slider-container" style="padding: 0 16px;">
+            <input type="range" id="dv1-slider" name="dv1_x_estimation" min="0" max="100" value="50">
+            <span class="slider-value">50</span>
+            <span>pt</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="question-block" id="q-dv4">
+        <label class="question-label">
+          Q2. （ゴシップ発信者※）は、Xの評判を意図的に歪めて伝えようとしていたと思いますか？
+          <span class="question-note">※あなたがメッセージを受け取った相手（AまたはB）のことです。</span>
+        </label>
+        <div class="question-body">
+          <div class="likert-scale-7" data-question-name="dv4_gossiper_intent">
+            <span class="likert-label-left">全くそう思わない</span>
+            <label><input type="radio" name="dv4_gossiper_intent" value="1"><span>1</span></label>
+            <label><input type="radio" name="dv4_gossiper_intent" value="2"><span>2</span></label>
+            <label><input type="radio" name="dv4_gossiper_intent" value="3"><span>3</span></label>
+            <label><input type="radio" name="dv4_gossiper_intent" value="4"><span>4</span></label>
+            <label><input type="radio" name="dv4_gossiper_intent" value="5"><span>5</span></label>
+            <label><input type="radio" name="dv4_gossiper_intent" value="6"><span>6</span></label>
+            <label><input type="radio" name="dv4_gossiper_intent" value="7"><span>7</span></label>
+            <span class="likert-label-right">非常にそう思う</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="question-block" id="q-dv5-7">
+        <label class="question-label">
+          Q3. あなたがパートナーの優先順位を決定する際、以下の要素をどの程度重視しましたか？
+        </label>
+        <div class="question-body">
+          <label class="question-label-sub">3-1. ゴシップの内容</label>
+          <div class="likert-scale-7" data-question-name="dv5_importance_content">
+            <span class="likert-label-left">全く重視しなかった</span>
+            <label><input type="radio" name="dv5_importance_content" value="1"><span>1</span></label>
+            <label><input type="radio" name="dv5_importance_content" value="2"><span>2</span></label>
+            <label><input type="radio" name="dv5_importance_content" value="3"><span>3</span></label>
+            <label><input type="radio" name="dv5_importance_content" value="4"><span>4</span></label>
+            <label><input type="radio" name="dv5_importance_content" value="5"><span>5</span></label>
+            <label><input type="radio" name="dv5_importance_content" value="6"><span>6</span></label>
+            <label><input type="radio" name="dv5_importance_content" value="7"><span>7</span></label>
+            <span class="likert-label-right">非常に重視した</span>
+          </div>
+          <label class="question-label-sub">3-2. ゴシップ発信者の評判</label>
+          <div class="likert-scale-7" data-question-name="dv6_importance_reputation">
+            <span class="likert-label-left">全く重視しなかった</span>
+            <label><input type="radio" name="dv6_importance_reputation" value="1"><span>1</span></label>
+            <label><input type="radio" name="dv6_importance_reputation" value="2"><span>2</span></label>
+            <label><input type="radio" name="dv6_importance_reputation" value="3"><span>3</span></label>
+            <label><input type="radio" name="dv6_importance_reputation" value="4"><span>4</span></label>
+            <label><input type="radio" name="dv6_importance_reputation" value="5"><span>5</span></label>
+            <label><input type="radio" name="dv6_importance_reputation" value="6"><span>6</span></label>
+            <label><input type="radio" name="dv6_importance_reputation" value="7"><span>7</span></label>
+            <span class="likert-label-right">非常に重視した</span>
+          </div>
+          <label class="question-label-sub">3-3. ゴシップが歪められている可能性</label>
+          <div class="likert-scale-7" data-question-name="dv7_importance_distortion">
+            <span class="likert-label-left">全く重視しなかった</span>
+            <label><input type="radio" name="dv7_importance_distortion" value="1"><span>1</span></label>
+            <label><input type="radio" name="dv7_importance_distortion" value="2"><span>2</span></label>
+            <label><input type="radio" name="dv7_importance_distortion" value="3"><span>3</span></label>
+            <label><input type="radio" name="dv7_importance_distortion" value="4"><span>4</span></label>
+            <label><input type="radio" name="dv7_importance_distortion" value="5"><span>5</span></label>
+            <label><input type="radio" name="dv7_importance_distortion" value="6"><span>6</span></label>
+            <label><input type="radio" name="dv7_importance_distortion" value="7"><span>7</span></label>
+            <span class="likert-label-right">非常に重視した</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="validation-error-message">
+        未回答の質問項目があります。赤枠の質問にご回答ください。
+      </div>
+
+    </div> <div class="navigation-footer">
+      <button type="submit" class="btn btn-primary" id="next-button">
+        回答を決定する
+      </button>
+    </div>
+
+  </div> <div class="experiment-footer"> ... </div>
+  <div class="modal-overlay" id="rules-modal"> ... </div>
+
+{% endblock %}
+
+
+{# --- ページ固有スクリプト --- #}
+{% block scripts %}
+  <script src="{% static 'common.js' %}"></script>
+  <script>
+    (function() {
+      // Q1 (DV1) のスライダーを初期化 (common.js の関数を呼ぶ)
+      if (window.setupSliderSync) {
+        window.setupSliderSync('#dv1-slider', '.slider-value');
+      }
+
+      const form = document.getElementById('form'); // oTreeが生成するフォーム
+      const errorMessage = document.getElementById('validation-error-message');
+
+      form.addEventListener('submit', function(event) {
+        // common.js のバリデーション関数を呼び出す
+        if (window.validateForm && !window.validateForm(form)) {
+          // バリデーション失敗
+          event.preventDefault(); // oTreeへの送信を中止
+          errorMessage.style.display = 'block';
+          const firstError = form.querySelector('.question-error');
+          if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        } else {
+          // バリデーション成功
+          errorMessage.style.display = 'none';
+          // そのままフォームを送信
+        }
+      });
+    })();
+  </script>
+{% endblock %}

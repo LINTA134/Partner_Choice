@@ -1,0 +1,488 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{# --- 共通CSS/JSの読み込み --- #}
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+  
+  {# P14 固有のスタイル #}
+  <style>
+
+    /* --- 1. D&D UI (セクション1) --- */
+    
+    /* ドロップ先 (順位) */
+    .dropzone-container {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 2px dashed #E0E0E0;
+    }
+    .dropzone {
+      width: 150px;
+      height: 150px;
+      border: 2px dashed #E0E0E0;
+      border-radius: 8px;
+      background-color: #F9F9F9;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start; /* ラベルを上に */
+      align-items: center;
+      padding-top: 8px; /* ラベル用パディング */
+      box-sizing: border-box; /* パディングを含めてサイズ計算 */
+    }
+    .dropzone .dropzone-label {
+      font-weight: bold;
+      font-size: 1.1em;
+      color: #000000;
+      margin-bottom: 8px;
+    }
+    /* (D&Dの .is-filled, .is-over スタイルは common.css 側で定義) */
+
+    /* ドラッグ元 (プレイヤー) */
+    .draggable-container {
+      display: flex;
+      justify-content: space-around;
+      padding: 16px;
+      background-color: #F9F9F9;
+      border-radius: 8px;
+      min-height: 160px; /* アイコンがなくなっても高さを維持 */
+    }
+    
+    /* common.cssの.profile-cardをD&D用に上書き */
+    .profile-card.draggable {
+      width: 120px;
+      padding: 12px;
+      cursor: grab;
+    }
+    /* (D&Dの .is-dragging スタイルは common.css 側で定義) */
+
+    /* ドロップゾーンに入った.profile-cardのスタイル */
+    .dropzone .profile-card.draggable {
+      cursor: grab;
+      margin-top: 0; /* ラベルとの隙間調整 */
+    }
+    
+    /* (中略: P14固有スタイルの残り... .decision-block, .result-summary-box など) */
+    .decision-block {
+      display: flex;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid #F0F0F0;
+    }
+    .decision-block:last-child { border-bottom: none; }
+    .decision-block .player-name { font-weight: bold; width: 120px; flex-shrink: 0; }
+    .decision-block .slider-group { flex-grow: 1; }
+    .distribute-display-simple {
+      font-size: 0.9em; color: #454545; margin-top: 4px; text-align: center;
+    }
+    .distribute-display-simple span { font-weight: bold; color: #3B95C4; }
+    #result-summary-box { display: none; }
+    #result-details { border-bottom: 2px solid #E0E0E0; margin-bottom: 16px; }
+    .result-line-item { padding: 12px 0; border-top: 1px solid #F0F0F0; }
+    .result-line-item:first-child { border-top: none; }
+    .result-line-item h4 { font-size: 1.2em; color: #000000; margin: 0 0 8px 0; }
+    .result-line-item p { font-size: 0.9em; margin: 4px 0; line-height: 1.5; }
+    .result-line-item p span.calc-value { font-weight: bold; color: #3B95C4; }
+    #result-total-gain { text-align: center; font-size: 1.3em; font-weight: bold; margin: 16px 0; }
+    #result-total-gain span.calc-value { font-size: 1.5em; color: #3B95C4; }
+    #reset-button-container { text-align: center; margin-top: 24px; }
+  </style>
+{% endblock %}
+
+{# --- ページのタイトル --- #}
+{% block title %}
+  タスク２：お返しゲーム全体練習
+{% endblock %}
+
+{# --- ページのメインコンテンツ --- #}
+{% block content %}
+
+  {# SVGアイコンの定義 #}
+  <svg class="icon-svg">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+
+  <div class="experiment-container">
+    
+    <div class="progress-tabs">
+      <div class="tab-button active" id="tab-role2">あなたの進捗</div>
+      <div class="tab-button" id="tab-role1">他メンバーの進捗</div>
+    </div>
+
+    <div class="progress-content">
+      <div class="progress-steps active" id="steps-role2">
+        <div class="step completed"><div class="step-number">1</div>同意取得</div>
+        <div class="step completed"><div class="step-number">2</div>実験概要説明</div>
+        <div class="step completed"><div class="step-number">3</div>タスク１説明</div>
+        <div class="step current"><div class="step-number">4</div>タスク２説明</div>
+        <div class="step"><div class="step-number">5</div>アンケート</div>
+        <div class="step"><div class="step-number">6</div>報酬の確認</div>
+      </div>
+      <div class="progress-steps" id="steps-role1">
+         <div class="step completed"><div class="step-number">1</div>同意取得</div>
+         <div class="step completed"><div class="step-number">2</div>実験概要説明</div>
+         <div class="step completed"><div class="step-number">3</div>タスク１説明</div>
+         <div class="step current"><div class="step-number">4</div>タスク１実施</div>
+         <div class="step"><div class="step-number">5</div>アンケート</div>
+         <div class="step"><div class="step-number">6</div>報酬の確認</div>
+      </div>
+    </div>
+    
+    <div class="experiment-header">
+      <div class="room-tabs">
+        <div>作業ルーム1</div>
+        <div class="active">作業ルーム2</div>
+        <div>全体ルーム</div> 
+      </div>
+      <div class="header-right-panel">
+        <button type="button" class="rule-check-button" id="open-rules-modal">
+          ルールを確認する
+        </button>
+        <div class="user-profile">
+          <div class="icon icon-user">
+            <svg><use xlink:href="#icon-person"></use></svg>
+          </div>
+          <span class="name">あなた</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <h2 id="page-title">タスク２：お返しゲーム 全体練習</h2>
+      <p>
+        タスク２で行う「優先順位付け」と「贈り物（信頼ゲーム）」の練習です。<br>
+        すべての入力（順位、贈与額、返礼ルール）を設定した後、「結果をシミュレーションする」ボタンを押してください。
+      </p>
+
+      <div class="rule-box" style="margin-top: 32px;">
+        <h3>セクション1: 相手の「返礼ルール」の仮定</h3>
+        <div class="decision-block" data-player-id="p1">
+          <span class="player-name">練習相手1</span>
+          <div class="slider-group">
+            <div class="slider-container">
+              <span>届いた額の</span>
+              <input type="range" class="return-rate-slider" min="0" max="100" value="50">
+              <span class="slider-value">50</span>
+              <span>% を返礼する</span>
+            </div>
+          </div>
+        </div>
+        <div class="decision-block" data-player-id="p2">
+          <span class="player-name">練習相手2</span>
+          <div class="slider-group">
+            <div class="slider-container">
+              <span>届いた額の</span>
+              <input type="range" class="return-rate-slider" min="0" max="100" value="50">
+              <span class="slider-value">50</span>
+              <span>% を返礼する</span>
+            </div>
+          </div>
+        </div>
+        <div class="decision-block" data-player-id="p3">
+          <span class="player-name">練習相手3</span>
+          <div class="slider-group">
+            <div class="slider-container">
+              <span>届いた額の</span>
+              <input type="range" class="return-rate-slider" min="0" max="100" value="50">
+              <span class="slider-value">50</span>
+              <span>% を返礼する</span>
+            </div>
+          </div>
+        </div>
+        <div class="decision-block" data-player-id="p4">
+          <span class="player-name">練習相手4</span>
+          <div class="slider-group">
+            <div class="slider-container">
+              <span>届いた額の</span>
+              <input type="range" class="return-rate-slider" min="0" max="100" value="50">
+              <span class="slider-value">50</span>
+              <span>% を返礼する</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rule-box" style="background-color: #FFFFFF;">
+        <h3>セクション2: パートナーの優先順位付け</h3>
+        <p style="text-align: center;">下の4人の練習相手を、上の1位〜4位の枠にドラッグ＆ドロップしてください。</p>
+        
+        <div class="dropzone-container" id="dropzone-container">
+          <div class="dropzone" data-rank="1"><span class="dropzone-label">1位</span></div>
+          <div class="dropzone" data-rank="2"><span class="dropzone-label">2位</span></div>
+          <div class="dropzone" data-rank="3"><span class="dropzone-label">3位</span></div>
+          <div class="dropzone" data-rank="4"><span class="dropzone-label">4位</span></div>
+        </div>
+        
+        <div class="draggable-container" id="draggable-container">
+          <div class="profile-card draggable" data-player-id="p1" draggable="true">
+            <div class="icon icon-practice-receiver"><svg><use xlink:href="#icon-person"></use></svg></div>
+            <span class="name">練習相手1</span>
+          </div>
+          <div class="profile-card draggable" data-player-id="p2" draggable="true">
+            <div class="icon icon-practice-receiver"><svg><use xlink:href="#icon-person"></use></svg></div>
+            <span class="name">練習相手2</span>
+          </div>
+          <div class="profile-card draggable" data-player-id="p3" draggable="true">
+            <div class="icon icon-practice-receiver"><svg><use xlink:href="#icon-person"></use></svg></div>
+            <span class="name">練習相手3</span>
+          </div>
+          <div class="profile-card draggable" data-player-id="p4" draggable="true">
+            <div class="icon icon-practice-receiver"><svg><use xlink:href="#icon-person"></use></svg></div>
+            <span class="name">練習相手4</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rule-box" style="margin-top: 32px;">
+        <h3>セクション3: あなたの「贈り物」の額の決定</h3>
+
+        <div class="decision-block" data-player-id="p1">
+          <span class="player-name">練習相手1</span>
+          <div class="slider-group">
+            <div class="slider-container">
+              <input type="range" class="invest-slider" min="0" max="100" value="50">
+              <span class="slider-value">50</span>
+            </div>
+            <div class="distribute-display-simple">
+              (あなたの取り分: <span class="gain-you-display">50</span> pt / 相手に届く額: <span class="received-display">150</span> pt)
+            </div>
+          </div>
+        </div>
+        <div class="decision-block" data-player-id="p2">
+          <span class="player-name">練習相手2</span>
+          <div class="slider-group">
+            <div class="slider-container">
+              <input type="range" class="invest-slider" min="0" max="100" value="50">
+              <span class="slider-value">50</span>
+            </div>
+            <div class="distribute-display-simple">
+              (あなたの取り分: <span class="gain-you-display">50</span> pt / 相手に届く額: <span class="received-display">150</span> pt)
+            </div>
+          </div>
+        </div>
+        <div class="decision-block" data-player-id="p3">
+          <span class="player-name">練習相手3</span>
+          <div class="slider-group">
+            <div class="slider-container">
+              <input type="range" class="invest-slider" min="0" max="100" value="50">
+              <span class="slider-value">50</span>
+            </div>
+            <div class="distribute-display-simple">
+              (あなたの取り分: <span class="gain-you-display">50</span> pt / 相手に届く額: <span class="received-display">150</span> pt)
+            </div>
+          </div>
+        </div>
+        <div class="decision-block" data-player-id="p4">
+          <span class="player-name">練習相手4</span>
+          <div class="slider-group">
+            <div class="slider-container">
+              <input type="range" class="invest-slider" min="0" max="100" value="50">
+              <span class="slider-value">50</span>
+            </div>
+            <div class="distribute-display-simple">
+              (あなたの取り分: <span class="gain-you-display">50</span> pt / 相手に届く額: <span class="received-display">150</span> pt)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin: 32px 0;">
+        <button type="button" class="btn btn-primary" id="calculate-button" style="padding: 16px 32px; font-size: 1.2em;">
+          結果をシミュレーションする
+        </button>
+      </div>
+
+      <div class="sim-summary-box" id="result-summary-box">
+        <h3>シミュレーション結果</h3>
+        <div id="result-details">
+          </div>
+        <div id="result-total-gain">
+          あなたの総利得（合計12回分）: <span class="calc-value" id="total-gain-display">0</span> pt
+        </div>
+        <div id="reset-button-container">
+          <button type="button" class="btn btn-secondary" id="reset-button">
+            練習をリセット
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="navigation-footer">
+      {% next_button %}
+    </div>
+
+  </div> <div class="experiment-footer">
+    <a id="quit-link">実験への参加を中断する</a>
+  </div>
+
+  <div class="modal-overlay" id="rules-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>ルール確認</span>
+        <button class="close-button" id="close-rules-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="rules-modal-body">
+        <p>（現在、確認できるルールはありません）</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+
+{# --- ページ固有スクリプト --- #}
+{% block scripts %}
+
+  <script src="{% static 'common.js' %}"></script>
+
+  <script>
+    (function() {
+      // ★ common.js から DragDropController と setupSliderSync が
+      //    window オブジェクトに読み込まれている前提
+      
+      const players = ['p1', 'p2', 'p3', 'p4'];
+      const rankGamesCount = { 1: 6, 2: 3, 3: 2, 4: 1 };
+      
+      const calculateButton = document.getElementById('calculate-button');
+      const resultBox = document.getElementById('result-summary-box');
+      const resultDetails = document.getElementById('result-details');
+      const totalGainDisplay = document.getElementById('total-gain-display');
+      const resetButton = document.getElementById('reset-button');
+
+      // ★★★ 修正点(1) ★★★
+      // 元のP14.html にあったダミーの dndState オブジェクトと
+      // DOMContentLoaded リスナー、ダミーの setupSliderSync 関数を削除。
+      // 代わりに、common.js の関数を「初期化(init)」する。
+      
+      // --- 1. D&D の初期化 ---
+      // common.js の DragDropController を初期化
+      window.DragDropController.init(
+        '.draggable',          // ドラッグ対象
+        '.dropzone',           // ドロップ先
+        '#draggable-container' // ドラッグ元
+      );
+
+      // --- 2. スライダー連動 ---
+      
+      // (a) P14固有の「贈与スライダー」連動 (これは P14.html 固有なので残す)
+      const setupInvestSliderSync = (selector) => {
+         document.querySelectorAll(selector).forEach(slider => {
+            const block = slider.closest('.decision-block');
+            const valueDisplay = block.querySelector('.slider-value');
+            const gainYouDisplay = block.querySelector('.gain-you-display');
+            const receivedDisplay = block.querySelector('.received-display');
+
+            // input イベントリスナーを追加
+            const updateValues = () => {
+              const investment = parseInt(slider.value);
+              const yourGain = 100 - investment;
+              const received = investment * 3; // ★注：練習では3倍
+              
+              if(valueDisplay) valueDisplay.textContent = investment;
+              if(gainYouDisplay) gainYouDisplay.textContent = yourGain;
+              if(receivedDisplay) receivedDisplay.textContent = received;
+            };
+            
+            slider.addEventListener('input', updateValues);
+            updateValues(); // 初期値も反映
+         });
+      };
+      
+      // (b) 共通の「返礼スライダー」連動 (common.js の関数を呼ぶ)
+      window.setupSliderSync('.return-rate-slider', '.slider-value');
+
+      // (a) の実行
+      setupInvestSliderSync('.invest-slider');
+
+
+      // --- 3. シミュレーション実行 (P14.html と同じロジック) ---
+      calculateButton.addEventListener('click', () => {
+        
+        // ★★★ 修正点(2) ★★★
+        // ダミーの dndState.isComplete() を
+        // common.js の DragDropController.getState() に置き換え
+        const currentState = window.DragDropController.getState();
+        
+        if (!currentState.isComplete()) {
+          alert('セクション2: 全員の優先順位を決定してください。');
+          return;
+        }
+
+        let totalGain = 0;
+        resultDetails.innerHTML = ''; 
+
+        for (let rank = 1; rank <= 4; rank++) {
+          
+          // ★★★ 修正点(3) ★★★
+          // dndState.ranks[rank] を currentState.ranks[rank] に置き換え
+          const playerId = currentState.ranks[rank];
+          
+          const playerNameEl = document.querySelector(`.draggable[data-player-id="${playerId}"] .name`);
+          if (!playerNameEl) continue; // 安全装置
+          
+          const playerName = playerNameEl.textContent;
+          const gameCount = rankGamesCount[rank];
+          
+          const investSlider = document.querySelector(`.decision-block[data-player-id="${playerId}"] .invest-slider`);
+          const returnRateSlider = document.querySelector(`.decision-block[data-player-id="${playerId}"] .return-rate-slider`);
+          
+          const investment = parseInt(investSlider.value);
+          const returnRate = parseInt(returnRateSlider.value) / 100;
+          
+          const yourKeep = 100 - investment; 
+          const received = investment * 2; 
+          const returned = Math.floor(received * returnRate);
+          const gainPerGame = yourKeep + returned;
+          const gainTotalRank = gainPerGame * gameCount;
+          
+          totalGain += gainTotalRank;
+
+          const resultHTML = `
+            <div class="result-line-item">
+              <h4>【${rank}位】${playerName}（${gameCount}回分）</h4>
+              <p>
+                あなたの贈与額: <span class="calc-value">${investment}</span> pt (相手に届く額: ${received} pt)<br>
+                相手の返礼(仮定): ${received} pt × ${returnRate * 100}% = <span class="calc-value">${returned}</span> pt<br>
+                1回あたり利得: (100 - ${investment}) + ${returned} = <span class="calc-value">${gainPerGame}</span> pt<br>
+                <strong>${gameCount}回分 合計利得: ${gainPerGame} × ${gameCount} = <span class="calc-value">${gainTotalRank}</span> pt</strong>
+              </p>
+            </div>
+          `;
+          resultDetails.insertAdjacentHTML('beforeend', resultHTML);
+        }
+        
+        totalGainDisplay.textContent = totalGain;
+        resultBox.style.display = 'block';
+      });
+
+      // --- 4. リセット処理 ---
+      resetButton.addEventListener('click', () => {
+        // ★★★ 修正点(4) ★★★
+        // dndState.reset() を common.js の関数に置き換え
+        window.DragDropController.reset();
+        
+        // b. 贈与スライダーをリセット (P14.html と同じ)
+        document.querySelectorAll('.invest-slider').forEach(slider => {
+          slider.value = 50;
+          slider.dispatchEvent(new Event('input')); // 連動表示を更新
+        });
+        
+        // c. 返礼スライダーをリセット (P14.html と同じ)
+        document.querySelectorAll('.return-rate-slider').forEach(slider => {
+          slider.value = 50;
+          slider.dispatchEvent(new Event('input')); // 連動表示を更新
+        });
+        
+        // d. 結果ボックスを非表示 (P14.html と同じ)
+        resultBox.style.display = 'none';
+        totalGainDisplay.textContent = '0';
+        resultDetails.innerHTML = '';
+      });
+
+    })();
+  </script>
+
+{% endblock %}

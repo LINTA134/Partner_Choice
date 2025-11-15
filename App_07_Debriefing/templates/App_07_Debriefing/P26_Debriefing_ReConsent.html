@@ -1,0 +1,115 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{# --- 共通CSS/JSの読み込み --- #}
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+  <style>
+    .content-area h4 {
+        font-size: 1.1em;
+        color: #000000;
+        margin-top: 24px;
+        margin-bottom: 8px;
+        border-left: 4px solid #3B95C4;
+        padding-left: 8px;
+    }
+    .navigation-footer {
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+    .navigation-footer p.consent-prompt {
+      font-size: 0.9em;
+      color: #454545;
+      margin: 0 0 16px 0;
+    }
+    .navigation-footer .nav-bottom-row {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+    }
+    /* ★ `formfields` が生成するoTree標準のフォーム要素を
+          直接スタイリング（または .otree-form-group など） */
+    .consent-check-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  </style>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'common.js' %}"></script>
+
+{% endblock %}
+
+{# --- ページのタイトル --- #}
+{% block title %}
+  デブリーフィングと最終同意
+{% endblock %}
+
+{# --- ページのメインコンテンツ --- #}
+{% block content %}
+
+  {# SVGアイコンの定義 #}
+  <svg class="icon-svg">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+
+  <div class="experiment-container">
+    
+    <div class="content-area">
+      <h2 id="page-title"> 実験参加にあたっての同意説明</h2>
+      <p>
+        ご参加ありがとうございました。<br>
+        最後に、この実験の真の目的についてご説明します。これは、参加者の皆様の権利を守るために非常に重要な手続きです。
+
+      </p>
+      <h4 id="debrifing"> 1. デセプションの開示</h4>
+      <p> 
+        今回の実験では、真の目的を隠すため、始めにお伝えした通り、事実とは異なる説明を用いていました。<br>
+        <ol>
+          <li>役割１の参加者について:</li>
+            <p>
+              あなたがやりとりした役割１の人たちは、実在の参加者ではありません。<br>
+              彼らの行動や、あなたへの返礼額は、すべて私たち研究者が事前にプログラムした<strong>「ボット」</strong>です。
+            </p>
+          <li>「実験の進行」について:</li>
+            <p>
+              あなたが体験した「マッチング」、「タスク１の作業」、「報酬計算」は、すべて「現在、他の人間と同時に実験を行っている」と信じていただくための<strong>「演出」</strong>です。<br>
+              あなたに表示された待機時間は、すべて意図的に挿入されたものです。
+            </p>
+          <li>「メッセージ（ゴシップ）」について:</li>
+            <p>
+              あなたが受け取ったメッセージも、私たちが事前に作成したものです。
+            </p>
+        </ol>
+      </p>
+      <h4 id="purpose"> 2. 真の研究目的</h4>
+      <p> 
+        この実験の真の目的は、「パートナーをめぐる競争があった際に、<strong>どのような人（協力的か/利己的か）</strong>から伝えられたゴシップを、人々がどの程度信じるのか」を調べることでした。
+      </p>
+      <h4 id="concent"> 3. 最終的な同意</h4>
+      <p>
+        ここまでご説明したすべての事実（欺瞞の使用、真の研究目的）をご理解いただいた上で、あなたが今回ご回答くださったデータを、匿名化した上で私たちの研究に使用することに同意いただけますでしょうか？<br>
+        ここで「同意しない」を選択した場合でも、あなたは一切の不利益（基本報酬の減額など）を被ることはありません。あなたのデータは即座に分析対象から除外されます。
+      </p>
+    </div>
+    
+    <div class="navigation-footer">
+      <div class="nav-bottom-row">
+        <div class="consent-check-area">
+          {% formfields %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="experiment-footer">
+    <a id="quit-link">実験への参加を中断する</a>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{# --- 共通CSS/JSの読み込み --- #}
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'common.js' %}"></script>
+{% endblock %}
+
+{# --- ページのタイトル --- #}
+{% block title %}
+  タスク２：説明①
+{% endblock %}
+
+{# --- ページのメインコンテンツ --- #}
+{% block content %}
+
+  {# SVGアイコンの定義 (oTreeの `content` 内に書く) #}
+  <svg class="icon-svg">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+
+  <div class="experiment-container">
+  
+    <div class="progress-tabs">
+      <div class="tab-button active" id="tab-role2">あなたの進捗</div>
+      <div class="tab-button" id="tab-role1">他メンバーの進捗</div>
+    </div>
+    
+    <div class="progress-content">
+      <div class="progress-steps active" id="steps-role2">
+        <div class="step completed"><div class="step-number">1</div>同意取得</div>
+        <div class="step completed"><div class="step-number">2</div>実験概要説明</div>
+        <div class="step completed"><div class="step-number">3</div>タスク１説明</div>
+        <div class="step current"><div class="step-number">4</div>タスク２説明</div>
+        <div class="step"><div class="step-number">5</div>アンケート</div>
+        <div class="step"><div class="step-number">6</div>報酬の確認</div>
+      </div>
+      <div class="progress-steps" id="steps-role1">
+        <div class="step completed"><div class="step-number">1</div>同意取得</div>
+        <div class="step completed"><div class="step-number">2</div>実験概要説明</div>
+        <div class="step completed"><div class="step-number">3</div>タスク１説明</div>
+        <div class="step current"><div class="step-number">4</div>タスク１実施</div>
+        <div class="step"><div class="step-number">5</div>アンケート</div>
+        <div class="step"><div class="step-number">6</div>報酬の確認</div>
+      </div>
+    </div>
+    
+    <div class="experiment-header">
+      <div class="room-tabs">
+        <div>作業ルーム1</div>
+        <div class="active">作業ルーム2</div>
+        <div>全体ルーム</div> 
+      </div>
+      <div class="header-right-panel">
+        <button type="button" class="rule-check-button" id="open-rules-modal">
+          ルールを確認する
+        </button>
+        <div class="user-profile">
+          <div class="icon icon-user">
+            <svg><use xlink:href="#icon-person"></use></svg>
+          </div>
+          <span class="name">あなた</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <h2 id="page-title">タスク２：お返しゲーム</h2>
+
+      <p>
+        このページでは、タスク２で行うお返しゲームのルールを説明します。<br>
+        このタスク２では、あなた（役割２）は<strong>相手にポイントを贈る</strong>ことになります。
+      </p>
+
+      <div class="rule-box">
+        <h3>【お返しゲームのルール】</h3>
+        <p>ゲームは二人一組で行われます。<br>
+           一人が贈り物を渡す人、もう一人が贈り物を<strong>お返しをする人</strong>を担います。</p>
+        <p><h4>【ステップ１】</h4>
+           贈り物を渡す側の人は、渡された100ポイントのうち相手に何ポイント贈るのかを決めます。<br>
+           <strong>ポイントは３倍になって</strong>お返しをする人に届きます。</p>
+        <div class="rule-image-container">
+          <img src="お返しゲーム①.svg" alt="お返しゲームのルール図解①">
+        </div>
+
+        <p><h4>【ステップ２】</h4>
+           お返しをする人は、３倍になったポイントから<strong>相手にいくら返礼するのか</strong>を決めます。<br>
+           相手に贈らなかったポイントは自身のものになります。</p>
+        <div class="rule-image-container">
+          <img src="お返しゲーム②.svg" alt="お返しゲームのルール図解②">
+        </div>
+      </div>
+    
+    </div>
+    
+    <div class="navigation-footer">
+      {% next_button %}
+    </div>
+
+  </div>
+  
+  <div class="experiment-footer">
+    <a id="quit-link">実験への参加を中断する</a>
+  </div>
+
+  <div class="modal-overlay" id="rules-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>ルール確認</span>
+        <button class="close-button" id="close-rules-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="rules-modal-body">
+        <p>（現在、確認できるルールはありません）</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

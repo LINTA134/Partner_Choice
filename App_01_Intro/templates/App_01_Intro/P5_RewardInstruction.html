@@ -1,0 +1,127 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{# --- 共通CSS/JSの読み込み --- #}
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'common.js' %}"></script>
+{% endblock %}
+
+{# --- ページのタイトル --- #}
+{% block title %}
+  実験の概要②
+{% endblock %}
+
+{# --- ページのメインコンテンツ --- #}
+{% block content %}
+
+  {# SVGアイコンの定義 (oTreeの `content` 内に書く) #}
+  <svg class="icon-svg">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+
+  <div class="experiment-container">
+  
+    <div class="progress-tabs">
+      <div class="tab-button active">実験の進捗</div>
+    </div>
+    
+    <div class="progress-content">
+      <div class="progress-steps active">
+        <div class="step completed"><div class="step-number">1</div>同意取得</div>
+        <div class="step current"><div class="step-number">2</div>実験概要説明</div>
+        <div class="step"><div class="step-number">3</div>タスク１説明</div>
+        <div class="step"><div class="step-number">4</div>．．．．．．</div>
+        <div class="step"><div class="step-number">5</div>．．．．．．</div>
+        <div class="step"><div class="step-number">6</div>．．．．．．</div>
+      </div>
+    <div>
+    
+    <div class="experiment-header">
+      
+      <div class="room-tabs">
+        <div>作業ルーム1</div>
+        <div>作業ルーム2</div>
+        <div class="active">全体ルーム</div> </div>
+      
+      <div class="header-right-panel">
+        <button type="button" class="rule-check-button" id="open-rules-modal">
+          ルールを確認する
+        </button>
+        <div class="user-profile">
+          <div class="icon icon-user">
+            <svg><use xlink:href="#icon-person"></use></svg>
+          </div>
+          <span class="name">あなた</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <h2>実験の概要②</h2>
+
+      <p>
+        続いて、あなたたちの実験の報酬について説明します。
+      </p>
+
+      <div class="rule-box">
+        <h3>役割１の報酬</h3>
+        <p>
+          報酬は、役割２の人からつけられる協力のパートナーとしての優先順位に左右されます。<br>
+          ランキングに応じて、獲得可能なポイントは次のように変化します。
+          <ul>
+            <li>優先順位１位 : 最大 2700 pt</li>
+            <li>優先順位２位 : 最大 2100 pt</li>
+            <li>優先順位３位 : 最大 1900 pt</li>
+            <li>優先順位４位 : 最大 1700 pt</li>
+          </ul>
+        </p>
+        <p>
+          もしも、多くの報酬を得たいのならば、役割２の人にアピールする必要があります。<br>
+          そのため、 <strong>他の役割１の人たちは優先順位１位の座を競い合うライバル</strong> となります。
+        </p>
+      </div>
+
+      <div class="rule-box">
+        <h3>役割２の報酬</h3>
+        <p>
+          報酬は自分が選んだ協力のパートナーの優先順位に左右されます。<br>
+          役割２の人は、限られた情報をもとに、役割１の人の中から自分の協力のパートナーを選ぶ必要があります。<br>
+          役割１の人のうち、誰が信用できる協力のパートナーを選ぶために、 <strong>与えられた情報を吟味する</strong> ことが求められます。
+        </p>
+      </div>
+      
+      <p>
+        <br>
+        まずは、あなたの「役割」をランダムに決定します。
+      </p>
+    </div>
+    
+    <div class="navigation-footer">
+      {% next_button %}
+    </div>
+
+  </div>
+  
+  <div class="experiment-footer">
+    <a id="quit-link">実験への参加を中断する</a>
+  </div>
+
+  <div class="modal-overlay" id="rules-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>ルール確認</span>
+        <button class="close-button" id="close-rules-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="rules-modal-body">
+        <p>（現在、確認できるルールはありません）</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

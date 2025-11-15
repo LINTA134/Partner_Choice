@@ -1,0 +1,240 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{# --- 共通CSS/JSの読み込み --- #}
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+  
+  {# P18 固有のスタイル #}
+  <style>
+    .member-profile-container {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .action-container {
+      text-align: center;
+      min-height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 24px 0;
+    }
+  </style>
+{% endblock %}
+
+{# --- ページのタイトル --- #}
+{% block title %}
+  タスク２：情報収集
+{% endblock %}
+
+{# --- ページのメインコンテンツ --- #}
+{% block content %}
+
+  <svg class="icon-svg">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+
+  <div class="experiment-container">
+    
+    <div class="progress-tabs">
+      <div class="tab-button active" id="tab-role2">あなたの進捗</div>
+      <div class="tab-button" id="tab-role1">他メンバーの進捗</div>
+    </div>
+
+    <div class="progress-content">
+      <div class="progress-steps active" id="steps-role2">
+        <div class="step completed"><div class="step-number">1</div>同意取得</div>
+        <div class="step completed"><div class="step-number">2</div>実験概要説明</div>
+        <div class="step completed"><div class="step-number">3</div>タスク１説明</div>
+        <div class="step current"><div class="step-number">4</div>タスク２説明</div>
+        <div class="step"><div class="step-number">5</div>アンケート</div>
+        <div class="step"><div class="step-number">6</div>報酬の確認</div>
+      </div>
+      <div class="progress-steps" id="steps-role1">
+         <div class="step completed"><div class="step-number">1</div>同意取得</div>
+         <div class="step completed"><div class="step-number">2</div>実験概要説明</div>
+         <div class="step completed"><div class="step-number">3</div>タスク１説明</div>
+         <div class="step current"><div class="step-number">4</div>タスク１実施</div>
+         <div class="step"><div class="step-number">5</div>アンケート</div>
+         <div class="step"><div class="step-number">6</div>報酬の確認</div>
+      </div>
+    </div>
+    
+    <div class="experiment-header">
+      <div class="room-tabs">
+        <div>作業ルーム1</div>
+        <div class="active">作業ルーム2</div>
+        <div>全体ルーム</div> 
+      </div>
+      <div class="header-right-panel">
+        <button type="button" class="rule-check-button" id="open-rules-modal">
+          ルールを確認する
+        </button>
+        <div class="user-profile">
+          <div class="icon icon-user">
+            <svg><use xlink:href="#icon-person"></use></svg>
+          </div>
+          <span class="name">あなた</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <h2 id="page-title">タスク２：情報収集</h2>
+
+      <p id="instruction-text">
+        役割１のメンバー（4名）の贈り物ゲームの行動記録と、あなた宛のメッセージが届いています。<br>
+        まずは「ランダムに選ばれた2名」の行動記録を確認します。
+      </p>
+
+      <div class="member-profile-container">
+        <div class="profile-card is-dimmed" id="player-A">
+          <div class="icon icon-a"><svg><use xlink:href="#icon-person"></use></svg></div>
+          <span class="name">レッドさん</span>
+          <span class="reputation-display" style="font-weight: bold; display: block; margin-top: 8px;">？？？</span>
+        </div>
+        <div class="profile-card is-dimmed" id="player-B">
+          <div class="icon icon-b"><svg><use xlink:href="#icon-person"></use></svg></div>
+          <span class="name">シアンさん</span>
+          <span class="reputation-display" style="font-weight: bold; display: block; margin-top: 8px;">？？？</span>
+        </div>
+        <div class="profile-card is-dimmed" id="player-C">
+          <div class="icon icon-c"><svg><use xlink:href="#icon-person"></use></svg></div>
+          <span class="name">グリーンさん</span>
+          <span class="reputation-display" style="font-weight: bold; display: block; margin-top: 8px;">？？？</span>
+        </div>
+        <div class="profile-card is-dimmed" id="player-X">
+          <div class="icon icon-x"><svg><use xlink:href="#icon-person"></use></svg></div>
+          <span class="name">オレンジさん</span>
+          <span class="reputation-display" style="font-weight: bold; display: block; margin-top: 8px;">？？？</span>
+        </div>
+      </div>
+
+      <div class="action-container" id="action-container">
+        <button type="button" class="btn btn-primary" id="check-reputation-button">
+          行動を確認する
+        </button>
+        <div class="loader hidden" id="loader-animation"></div>
+        <button type="button" class="btn btn-primary hidden" id="check-gossip-button">
+          メッセージを確認する
+        </button>
+      </div>
+
+      <div class="gossip-illustrator hidden" id="gossip-display-area">
+        <div class="profile-card" id="gossip-sender-card">
+           
+           {% if condition == 'cooperative' %}
+             <div class="icon icon-a"><svg><use xlink:href="#icon-person"></use></svg></div>
+             <span class="name" id="gossip-sender-name">レッドさん</span>
+           
+           {% else %}
+             <div class="icon icon-b"><svg><use xlink:href="#icon-person"></use></svg></div>
+             <span class="name" id="gossip-sender-name">シアンさん</span>
+           
+           {% endif %}
+           
+        </div>
+        <div class="speech-bubble" id="gossip-content">
+         「オレンジさんは贈り物ゲームで相手にポイントを全く贈りませんでした」
+        </div>
+      </div>
+
+    </div>
+    
+    <div class="navigation-footer">
+      <button type="submit" class="btn btn-primary" id="next-button" disabled>
+        次へ（意思決定へ進む）
+      </button>
+    </div>
+
+  </div>
+  
+  <div class="experiment-footer">
+    <a id="quit-link">実験への参加を中断する</a>
+  </div>
+
+  <div class="modal-overlay" id="rules-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>ルール確認</span>
+        <button class="close-button" id="close-rules-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="rules-modal-body">
+        <p>（現在、確認できるルールはありません）</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+
+{# --- ページ固有スクリプト --- #}
+{% block scripts %}
+
+  <script src="{% static 'common.js' %}"></script>
+
+  <script>
+    (function() {
+      // 演出の待機時間 (ミリ秒)
+      const loadingTime = 1000; // 1秒
+      
+      // --- UI要素の取得 ---
+      const instructionText = document.getElementById('instruction-text');
+      const nextButton = document.getElementById('next-button');
+      const cardA = document.getElementById('player-A');
+      const cardB = document.getElementById('player-B');
+      const actionContainer = document.getElementById('action-container');
+      const checkRepButton = document.getElementById('check-reputation-button');
+      const checkGossipButton = document.getElementById('check-gossip-button');
+      const loader = document.getElementById('loader-animation');
+      const gossipArea = document.getElementById('gossip-display-area');
+      
+      // --- 1. 「行動を確認する」ボタンの処理 ---
+      checkRepButton.addEventListener('click', () => {
+        checkRepButton.classList.add('hidden');
+        loader.classList.remove('hidden');
+        
+        setTimeout(() => {
+          loader.classList.add('hidden');
+          
+          // A (レッド) と B (シアン) の情報を開示
+          cardA.classList.remove('is-dimmed');
+          cardA.querySelector('.reputation-display').textContent = '平均 52 pt';
+          cardA.querySelector('.reputation-display').style.color = '#3B95C4';
+          
+          cardB.classList.remove('is-dimmed');
+          cardB.querySelector('.reputation-display').textContent = '平均 10 pt';
+          cardB.querySelector('.reputation-display').style.color = '#D9534F';
+          
+          instructionText.innerHTML = '2名の行動がランダムに開示されました。<br>次に「ランダムに選ばれた1名」からのメッセージを確認します。';
+          checkGossipButton.classList.remove('hidden');
+          
+        }, loadingTime);
+      });
+      
+      // --- 2. 「メッセージを確認する」ボタンの処理 ---
+      checkGossipButton.addEventListener('click', () => {
+        checkGossipButton.classList.add('hidden');
+        loader.classList.remove('hidden');
+        
+        setTimeout(() => {
+          loader.classList.add('hidden');
+
+          // ゴシップエリアを表示
+          gossipArea.classList.remove('hidden');
+          
+          // 説明文を更新し、「次へ」ボタンを有効化
+          instructionText.innerHTML = 'メッセージが開示されました。すべての情報を確認しましたので、次のステップへお進みください。';
+          nextButton.disabled = false;
+          
+        }, loadingTime);
+      });
+
+    })();
+  </script>
+
+{% endblock %}

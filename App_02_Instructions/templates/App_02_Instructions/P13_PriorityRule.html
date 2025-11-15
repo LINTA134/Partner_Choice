@@ -1,0 +1,153 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{# --- 共通CSS/JSの読み込み --- #}
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'common.js' %}"></script>
+{% endblock %}
+
+{# --- ページのタイトル --- #}
+{% block title %}
+  実験の概要①
+{% endblock %}
+
+{# --- ページのメインコンテンツ --- #}
+{% block content %}
+
+  {# SVGアイコンの定義 (oTreeの `content` 内に書く) #}
+  <svg class="icon-svg">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+
+  <div class="experiment-container">
+  
+    <div class="progress-tabs">
+      <div class="tab-button active">実験の進捗</div>
+    </div>
+    
+    <div class="progress-content">
+      <div class="progress-steps active">
+        <div class="step completed"><div class="step-number">1</div>同意取得</div>
+        <div class="step current"><div class="step-number">2</div>実験概要説明</div>
+        <div class="step"><div class="step-number">3</div>タスク１説明</div>
+        <div class="step"><div class="step-number">4</div>．．．．．．</div>
+        <div class="step"><div class="step-number">5</div>．．．．．．</div>
+        <div class="step"><div class="step-number">6</div>．．．．．．</div>
+      </div>
+    <div>
+    
+    <div class="experiment-header">
+      
+      <div class="room-tabs">
+        <div>作業ルーム1</div>
+        <div>作業ルーム2</div>
+        <div class="active">全体ルーム</div> </div>
+      
+      <div class="header-right-panel">
+        <button type="button" class="rule-check-button" id="open-rules-modal">
+          ルールを確認する
+        </button>
+        <div class="user-profile">
+          <div class="icon icon-user">
+            <svg><use xlink:href="#icon-person"></use></svg>
+          </div>
+          <span class="name">あなた</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <h2 id="page-title">タスク２：パートナーの優先順位</h2>
+
+      <p>
+        このページでは、タスク２で行うパートナーの優先順位のルールを説明します。<br>
+      </p>
+
+      <div class="rule-box">
+        <h3>【優先順位のルール】</h3>
+        <p>あなたは役割１の４名に対して、パートナーの優先順位を決めてもらいます。<br>
+           優先順位を高くつければつけるほど、その人と<strong>お返しゲームをプレイする回数が増えます</strong>。</p>
+
+        
+        <p><h4>【参考情報】</h4>
+           贈り物ゲームで平均して<strong>相手にどれだけ送ったのか</strong>という情報をあなたに提示します。<br>
+           あなたは、４名のうちランダムに決められた２名の平均贈与額を知ることができます。<br>
+           加えて、あなた宛てに役割１の人１名からメッセージが届けられます。
+        </p>
+        <p>
+          情報①：２名の平均贈与額
+        </p>
+        <div class="rule-illustrator">
+          <div class="profile-card">
+            <div class="icon icon-null"><svg><use xlink:href="#icon-person"></use></svg></div>
+            <span class="name">
+              練習相手１<br>
+              平均 52 pt</span>
+          </div>
+          <div class="profile-card">
+            <div class="icon icon-null"><svg><use xlink:href="#icon-person"></use></svg></div>
+            <span class="name">平均 10 pt</span>
+          </div>
+          <div class="profile-card">
+            <div class="icon icon-null"><svg><use xlink:href="#icon-person"></use></svg></div>
+            <span class="name">？？？</span>
+          </div>
+          <div class="profile-card">
+           <div class="icon icon-null"><svg><use xlink:href="#icon-person"></use></svg></div>
+           <span class="name">？？？</span>
+          </div>
+        </div>
+        <p>
+          情報②：１名のメッセージ
+        </p>
+        <div class="gossip-illustrator">
+          <div class="profile-card" style="width: 100px; padding: 12px;">
+           <div class="icon icon-null" style="width: 40px; height: 40px;"><svg><use xlink:href="#icon-person"></use></svg></div>
+           <span class="name" style="font-size: 0.9em;">メンバーA</span>
+          </div>
+          <div class="speech-bubble">
+           「メンバーXは 約 0 pt を分配しました」
+          </div>
+        </div>       
+          
+        <p><h4>【プレイ回数】</h4>
+           お返しゲームは、合計12回行われます。プレイ回数は優先順位に応じて変化します。
+          <ul>
+            <li>１位：６回</li>
+            <li>２位：３回</li>
+            <li>３位：２回</li>
+            <li>４位：１回</li>
+          </ul></p>
+      </div>
+    
+    </div>
+    
+    <div class="navigation-footer">
+      {% next_button %}
+    </div>
+
+  </div>
+  
+  <div class="experiment-footer">
+    <a id="quit-link">実験への参加を中断する</a>
+  </div>
+
+  <div class="modal-overlay" id="rules-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>ルール確認</span>
+        <button class="close-button" id="close-rules-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="rules-modal-body">
+        <p>（現在、確認できるルールはありません）</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
