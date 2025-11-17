@@ -14,7 +14,7 @@ class P1_Consent(Page):
         # テンプレート（P1_Consent.html）に渡す
         return {'debug_condition': condition}
     
-    def before_next_page(self, timeout_happened): 
+    def before_next_page(self): 
         # timeout_happened が使われない場合でも定義は必要
         if not self.player.consent:
             self.participant.vars['consent_rejected'] = True
