@@ -4,6 +4,16 @@
 {# --- 共通CSS/JSの読み込み --- #}
 {% block styles %}
   <link rel="stylesheet" href="{% static 'common.css' %}">
+  <style>
+    .content-area h4 {
+        font-size: 1.1em;
+        color: #000000;
+        margin-top: 24px;
+        margin-bottom: 8px;
+        border-left: 4px solid #3B95C4;
+        padding-left: 8px;
+    }
+  </style>
 {% endblock %}
 
 {% block scripts %}
@@ -27,6 +37,10 @@
 
   <div class="experiment-container">
     
+    <div class="progress-tabs">
+      <div class="tab-button active">実験の進捗</div>
+    </div>
+
     <div class="progress-content">
       <div class="progress-steps active" id="steps-role2">
         <div class="step completed"><div class="step-number">1</div>同意取得</div>
@@ -36,13 +50,15 @@
         <div class="step"><div class="step-number">5</div>アンケート</div>
         <div class="step"><div class="step-number">6</div>報酬の確認</div>
       </div>
+    </div>
     
     <div class="experiment-header">
+      
       <div class="room-tabs">
         <div>作業ルーム1</div>
         <div>作業ルーム2</div>
-        <div class="active">全体ルーム</div> 
-      </div>
+        <div class="active">全体ルーム</div> </div>
+      
       <div class="header-right-panel">
         <button type="button" class="rule-check-button" id="open-rules-modal">
           ルールを確認する
@@ -70,12 +86,12 @@
           ゲームは二人一組で行われます。<br>
           ゲームが始まるごとにプレイヤーは 1000pt を渡されます。
           <p>
-        <p><h4>【ステップ１】</h4>
+        <p><h4>ステップ１</h4>
           贈り物を渡す側の人は、渡された1000ポイントのうち相手に何ポイント贈るのかを決めます。<br>
           <strong>ポイントは３倍になって</strong>お返しをする人に届きます。
         </p>
 
-        <p><h4>【ステップ２】</h4>
+        <p><h4>ステップ２</h4>
           お返しをする人は、３倍になったポイントから<strong>相手にいくら返礼するのか</strong>を決めます。<br>
           相手に贈らなかったポイントは自身のものになります。
         </p>
@@ -99,10 +115,6 @@
       {% next_button %}
     </div>
 
-  </div>
-  
-  <div class="experiment-footer">
-    <a id="quit-link">実験への参加を中断する</a>
   </div>
 
   <div class="modal-overlay" id="rules-modal">

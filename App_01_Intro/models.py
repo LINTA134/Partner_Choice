@@ -47,8 +47,14 @@ class Constants(BaseConstants):
     # --- お返しゲーム設定 ---
     # MULTIPLIER：投資額が何倍になって相手に届くのか
     INVESTMENT_MIN = 0
-    INVESTMENT_MAX = 100
-    MULTIPLIER = 2
+    INVESTMENT_MAX = 1000
+    MULTIPLIER = 3
+
+    # --- 練習ボットの挙動のランダム範囲 ---
+    # [贈る側] 練習で、ボットが何%返礼するか (10%～90%)
+    PRACTICE_BOT_RETURN_RATE_RANGE = (0.1, 0.9)
+    # [返礼側] 練習で、ボットがいくら贈ってくるか (0pt～1000pt)
+    PRACTICE_GIFT_FROM_BOT_RANGE = (0, 1000)
 
     # --- 報酬設定 ---
     # c(xxx)：int オブジェクトを Currency オブジェクトに変換
@@ -66,6 +72,10 @@ class Player(BasePlayer):
         widget=widgets.CheckboxInput,
         blank=True
         )
+    
+    #ページ内で決定されたBotの挙動を一時的に保存する
+    practice_bot_return_rate = models.FloatField(initial=0.0)
+    practice_bot_gift_amount = models.IntegerField(initial=0)
 
 class Subsession(BaseSubsession):
     def creating_session(self):

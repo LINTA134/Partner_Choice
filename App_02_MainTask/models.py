@@ -47,7 +47,7 @@ class Constants(BaseConstants):
     # --- お返しゲーム設定 ---
     # MULTIPLIER：投資額が何倍になって相手に届くのか
     INVESTMENT_MIN = 0
-    INVESTMENT_MAX = 100
+    INVESTMENT_MAX = 1000
     MULTIPLIER = 2
 
     # --- 報酬設定 ---
@@ -58,6 +58,12 @@ class Constants(BaseConstants):
     # 優先順位に応じたゲーム回数
     RANK_WEIGHTS = {1: 6, 2: 3, 3: 2, 4: 1}
     TOTAL_GAMES = sum(RANK_WEIGHTS.values())
+
+    # --- 練習ボットの挙動のランダム範囲 ---
+    # [贈る側] 練習で、ボットが何%返礼するか (10%～90%)
+    PRACTICE_BOT_RETURN_RATE_RANGE = (0.1, 0.9)
+    # [返礼側] 練習で、ボットがいくら贈ってくるか (0pt～1000pt)
+    PRACTICE_GIFT_FROM_BOT_RANGE = (0, 1000)
 
 class Player(BasePlayer):
     
