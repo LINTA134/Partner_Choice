@@ -60,11 +60,6 @@ class Constants(BaseConstants):
     TOTAL_GAMES = sum(RANK_WEIGHTS.values())
 
 class Player(BasePlayer):
-    
-    # --- 0. 条件変数 ---
-    # Subsessionで割り当てた条件を記録
-    #condition = models.StringField()
-
     # --- 1. 同意 ---
     consent = models.BooleanField(
         label="実験の注意事項を確認し、参加に同意しますか？",
@@ -73,10 +68,8 @@ class Player(BasePlayer):
         )
 
 class Subsession(BaseSubsession):
-    print("a")
     def creating_session(self):
         # 実験参加者に２つの条件をランダムに割り当てる
-        print("b")
         for player in self.get_players():
             condition = random.choice(['cooperative', 'selfish'])
             player.participant.vars['condition'] = condition
@@ -84,4 +77,4 @@ class Subsession(BaseSubsession):
             print(condition)
 
 class Group(BaseGroup):
-    pass # 1人実験のためGroupは使用しない
+    pass

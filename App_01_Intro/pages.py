@@ -7,12 +7,6 @@ from .models import Constants, Player
 class P1_Consent(Page):
     form_model = 'player'
     form_fields = ['consent']
-
-    def vars_for_template(self):
-        # creating_session で保存した 'condition' 変数を取得する
-        condition = self.participant.vars.get('condition')
-        # テンプレート（P1_Consent.html）に渡す
-        return {'debug_condition': condition}
     
     def before_next_page(self): 
         # timeout_happened が使われない場合でも定義は必要
@@ -42,23 +36,14 @@ class P3_GroupFormation(Page):
 # ----------------------------------------
 # ページ 4: 役割の説明
 # ----------------------------------------
-class P4_RoleInstruction(Page):
+class P4_ExperimentOverview(Page):
     def is_displayed(self):
         return self.participant.vars.get('consent_rejected') is None
 
 # ----------------------------------------
 # ページ 5: 報酬の説明
 # ----------------------------------------
-class P5_RewardInstruction(Page):
-    def is_displayed(self):
-        return self.participant.vars.get('consent_rejected') is None
-
-# ----------------------------------------
-# ページ 6: 役割割り当て待機 (演出)
-# ----------------------------------------
-class P6_RoleAssignmentWait(Page):
-    timeout_seconds = 3 # 5秒間 演出
-
+class P5_GameInstruction(Page):
     def is_displayed(self):
         return self.participant.vars.get('consent_rejected') is None
 
@@ -67,7 +52,6 @@ page_sequence = [
     P1_Consent,
     P2_MatchingWait,
     P3_GroupFormation,
-    P4_RoleInstruction,
-    P5_RewardInstruction,
-    P6_RoleAssignmentWait,
+    P4_ExperimentOverview,
+    P5_GameInstruction,
 ]
