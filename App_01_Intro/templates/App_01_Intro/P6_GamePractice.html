@@ -4,59 +4,139 @@
 {% block styles %}
   <link rel="stylesheet" href="{% static 'common.css' %}">
   <style>
-    /* 練習セクション間のマージン */
-    .practice-section {
-      margin-top: 32px;
-      padding-top: 24px;
-      border-top: 2px dashed #E0E0E0;
+    /* --- カードフリップ アニメーション設定 --- */
+    .sim-card-flipper {
+      position: relative;
+      width: 100%;
+      height: 550px; /* カードの高さ */
+      margin: 0 auto 48px auto;
+      perspective: 1000px;
     }
-    .practice-section:first-child {
-      margin-top: 0;
-      padding-top: 0;
-      border-top: none;
+    .sim-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+    .sim-card-flipper.is-flipped .sim-card-inner {
+      transform: rotateY(180deg);
     }
     
-    /* 結果表示エリア */
-    .sim-result-area {
-      display: none; /* JSで表示を制御 */
-      margin-top: 16px;
-      padding: 16px;
-      background-color: #F9F9F9;
+    /* 共通カードスタイル */
+    .sim-card, .card-face {
+      background-color: #FFFFFF;
       border: 1px solid #E0E0E0;
-      border-radius: 8px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+      box-sizing: border-box;
     }
-    .sim-result-area p {
-      margin: 8px 0;
-      font-size: 1.0em;
+
+    /* フリップカードの面設定 */
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
     }
-    .sim-result-area p.final-gain {
+    .card-face.front { z-index: 2; transform: rotateY(0deg); }
+    .card-face.back { transform: rotateY(180deg); background-color: #F9F9F9; }
+
+    /* --- 設定用カード (固定表示) --- */
+    .settings-card {
+      margin-bottom: 48px;
+      border: 2px solid #B560D4; /* 強調枠線 */
+      background-color: #FCFCFC;
+    }
+    .settings-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #E0E0E0;
+      padding-bottom: 16px;
+    }
+    .settings-header .icon {
+      width: 64px; height: 64px;
+      background-color: #FFFFFF;
+      border: 2px solid #E0E0E0;
+      border-radius: 12px;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .settings-header .icon svg { width: 70%; height: 70%; fill: #454545; }
+    .settings-header h3 { margin: 0; color: #333; }
+
+    /* --- コンテンツ内スタイル --- */
+    .sim-card-header {
       font-size: 1.2em;
       font-weight: bold;
+      color: #000000;
+      border-bottom: 2px solid #F0F0F0;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
     }
 
-    /* Bot挙動決定ボタンのコンテナ */
-    .bot-decision-container {
-      text-align: center;
-      padding: 24px 0;
+    /* プロフィールアイコンと矢印 */
+    .visual-flow {
+      display: flex; justify-content: center; align-items: center;
+      gap: 16px; margin-bottom: 24px;
     }
-
-    /* Bot挙動表示エリア (common.cssのgossip-illustratorを流用) */
-    .bot-behavior-display {
-      display: none; /* JSで表示を制御 */
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      margin: 24px 0;
-      background-color: #F9F9F9;
-      border: 1px solid #E0E0E0;
-      padding: 16px;
+    .visual-flow .arrow { font-size: 2em; color: #E0E0E0; font-weight: bold; }
+    .mini-profile { width: 100px; text-align: center; }
+    .mini-profile .icon {
+      width: 48px; height: 48px;
+      margin: 0 auto 8px auto;
       border-radius: 8px;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .mini-profile .icon svg { width: 60%; height: 60%; fill: #454545; }
+    .icon-user { background-color: #B560D4; }
+    .icon-bot { background-color: #FFFFFF; border: 2px solid #E0E0E0; }
+
+    /* 入力・表示エリア */
+    .input-area { flex: 1; text-align: left; }
+    .slider-group {
+      margin-bottom: 20px; padding: 12px;
+      background-color: #F9F9F9; border-radius: 8px;
+    }
+    .slider-group label {
+      display: block; font-weight: bold; margin-bottom: 8px;
+      font-size: 0.95em; color: #333;
+    }
+    .slider-container { display: flex; align-items: center; gap: 12px; }
+    .slider-container input[type="range"] { flex: 1; cursor: pointer; }
+    .slider-value {
+      font-weight: bold; color: #3B95C4;
+      font-size: 1.1em; width: 60px; text-align: right;
+    }
+    /* 読み取り専用の表示 */
+    .readonly-value {
+      display: block; text-align: center;
+      font-weight: bold; color: #555; background: #E0E0E0;
+      padding: 8px; border-radius: 4px;
     }
 
-    /* シミュレーション入力欄 (スライダーなど) */
-    .simulation-input-area {
-      display: none; /* JSで表示を制御 */
+    /* 結果表示エリア (裏面) */
+    .result-area {
+      flex: 1; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; gap: 16px;
     }
+    .result-row {
+      background-color: #FFFFFF; padding: 16px;
+      border-radius: 8px; border: 1px solid #E0E0E0;
+      width: 90%; text-align: center;
+    }
+    .result-row p { margin: 4px 0; font-size: 1.0em; }
+    .result-row .highlight { font-weight: bold; color: #3B95C4; font-size: 1.2em; }
+
+    .action-footer { margin-top: 16px; text-align: center; }
+
   </style>
 {% endblock %}
 
@@ -65,6 +145,7 @@
 {% endblock %}
 
 {% block content %}
+
   <svg class="icon-svg">
     <symbol id="icon-person" viewBox="0 0 24 24">
       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
@@ -76,7 +157,6 @@
     <div class="progress-tabs">
       <div class="tab-button active">実験の進捗</div>
     </div>
-
     <div class="progress-content">
       <div class="progress-steps active" id="steps-role2">
         <div class="step completed"><div class="step-number">1</div>同意取得</div>
@@ -89,12 +169,11 @@
     </div>
     
     <div class="experiment-header">
-      
       <div class="room-tabs">
         <div>作業ルーム1</div>
         <div>作業ルーム2</div>
-        <div class="active">全体ルーム</div> </div>
-      
+        <div class="active">全体ルーム</div> 
+      </div>
       <div class="header-right-panel">
         <button type="button" class="rule-check-button" id="open-rules-modal">
           ルールを確認する
@@ -111,112 +190,185 @@
     <div class="content-area">
       <h2 id="page-title">お返しゲーム 練習</h2>
       <p>
-        「お返しゲーム」の練習です。<br>
-        「贈り物を渡す側」と「返礼する側」の両方を、下のシミュレーターで自由に練習してください。
+        「練習相手」の行動を設定し、それに対して自分がどう行動するかをシミュレーションします。<br>
+        まずはじめに、練習相手の行動を決めてください。
       </p>
       
-      <div class="practice-section">
-        <h3>練習1：あなたが「贈り物を渡す側」</h3>
-        <p>
-            あなたは 1000 pt を持っています。練習相手にいくら贈りますか？<br>
-            あなたが贈った額は {{ Constants.MULTIPLIER }} 倍になって相手に届きます。
-        </p>
-        
-        <div class="rule-box">
-            
-          <div class="bot-decision-container" id="giver-bot-decision-area">
-            <p>まず、練習相手の「返礼ルール」をランダムに決めます。</p>
-            <button type="button" class="btn btn-primary" id="determine-giver-bot-btn">
-              返礼ルールを決める
-            </button>
+      <div class="sim-card settings-card">
+        <div class="settings-header">
+          <div class="icon icon-bot">
+            <svg><use xlink:href="#icon-person"></use></svg>
           </div>
-
-          <div class="bot-behavior-display" id="giver-bot-behavior-display">
-            <div class="profile-card" style="width: 100px; padding: 12px;">
-              <div class="icon icon-practice-receiver" style="width: 40px; height: 40px;"><svg><use xlink:href="#icon-person"></use></svg></div>
-              <span class="name" style="font-size: 0.9em;">練習相手</span>
-            </div>
-            <div class="speech-bubble" id="giver-bot-speech-bubble">
-              「届いた額の xx% を返礼します」
-            </div>
+          <div>
+            <h3>練習相手の設定</h3>
+            <span style="font-size: 0.9em; color: #666;">以下の２つの値をここで一括決定します</span>
           </div>
+        </div>
 
-          <div class="simulation-input-area" id="giver-simulation-area">
+        <div class="input-area">
+          <div class="slider-group">
+            <label>① 【相手が返礼側の場合】 届いた額の何％を返礼しますか？</label>
             <div class="slider-container">
-              <span>0 pt</span>
-              <input type="range" id="invest-slider" min="0" max="{{ Constants.INVESTMENT_MAX }}" value="50" style="flex: 1;">
-              <span>{{ Constants.INVESTMENT_MAX }} pt</span>
-              <span class="slider-value" id="invest-value-display" style="width: 50px; text-align: right;">50</span> pt
-            </div>
-            <div style="text-align: center; margin-top: 16px;">
-              <button type="button" class="btn btn-primary" id="calculate-giver-btn">
-                決定（結果をシミュレーション）
-              </button>
+              <span>0%</span>
+              <input type="range" id="setting-bot-rate" min="0" max="100" value="50">
+              <span class="slider-value" id="setting-bot-rate-display">50%</span>
             </div>
           </div>
-          
-          <div class="sim-result-area" id="giver-result-area">
-            <h4>計算結果 (贈る側)</h4>
-            <p>1. あなたは <span class="calc-value" data-id="investment">0</span> pt を贈りました。（あなたの取り分: <span class="calc-value" data-id="your_keep">0</span> pt）</p>
-            <p>2. 相手には <span class="calc-value" data-id="received_by_bot">0</span> pt が届きました。</p>
-            <p>3. 練習相手は <span class="calc-value" data-id="bot_return">0</span> pt をあなたに返礼しました。</p>
-            <p class="final-gain">
-              あなたの最終利得: (取り分 <span data-id="your_keep">0</span>) + (返礼 <span data-id="bot_return">0</span>) = <span class="calc-value" data-id="final_payoff">0</span> pt
-            </p>
+
+          <div class="slider-group">
+            <label>② 【相手が贈る側の場合】 あなたにいくら贈りますか？</label>
+            <div class="slider-container">
+              <span>0</span>
+              <input type="range" id="setting-bot-gift" min="0" max="{{ Constants.INVESTMENT_MAX }}" value="500">
+              <span class="slider-value" id="setting-bot-gift-display">500 pt</span>
+            </div>
           </div>
         </div>
       </div>
+      
+      <p style="text-align:center; font-weight:bold; margin-bottom: 32px;">
+        ▼ 設定した相手とシミュレーションを行います ▼
+      </p>
 
-      <div class="practice-section">
-        <h3>練習2：あなたが「返礼する側」</h3>
-        <p>
-          練習相手があなたに贈る額をランダムに決めます。<br>
-          練習相手から贈られた額は {{ Constants.MULTIPLIER }} 倍になってあなたに届きます。
-        </p>
 
-        <div class="rule-box">
-          <div class="bot-decision-container" id="receiver-bot-decision-area">
-            <p>まず、練習相手の「贈与額」をランダムに決めます。</p>
-            <button type="button" class="btn btn-primary" id="determine-receiver-bot-btn">
-              贈与額を決める
-            </button>
-          </div>
-
-          <div class="bot-behavior-display" id="receiver-bot-behavior-display">
-            <div class="profile-card" style="width: 100px; padding: 12px;">
-              <div class="icon icon-practice-receiver" style="width: 40px; height: 40px;"><svg><use xlink:href="#icon-person"></use></svg></div>
-              <span class="name" style="font-size: 0.9em;">練習相手</span>
-            </div>
-            <div class="speech-bubble" id="receiver-bot-speech-bubble">
-              「あなたに xx pt 贈ります」
-            </div>
-          </div>
+      <div class="sim-card-flipper" id="flipper-giver">
+        <div class="sim-card-inner">
           
-          <div class="simulation-input-area" id="receiver-simulation-area">
-            <p style="text-align: center; font-weight: bold;">
-              あなたには <span class="calc-value" id="received-by-you-display">0</span> pt が届きました。<br>
-              相手にいくら返礼しますか？
-            </p>
-            <div class="slider-container">
-              <span>0 pt</span>
-              <input type="range" id="return-slider" min="0" max="0" value="0" style="flex: 1;">
-              <span class="slider-value" id="return-value-display" style="width: 50px; text-align: right;">0</span> pt
+          <div class="card-face front">
+            <div class="sim-card-header">練習1：あなたが「贈り物を渡す側」</div>
+            
+            <div class="visual-flow">
+              <div class="mini-profile">
+                <div class="icon icon-user"><svg><use xlink:href="#icon-person"></use></svg></div>
+                <span>あなた</span>
+              </div>
+              <div class="arrow">→</div>
+              <div class="mini-profile">
+                <div class="icon icon-bot"><svg><use xlink:href="#icon-person"></use></svg></div>
+                <span>練習相手</span>
+              </div>
             </div>
-            <div style="text-align: center; margin-top: 16px;">
-              <button type="button" class="btn btn-primary" id="calculate-receiver-btn">
-                決定（結果をシミュレーション）
-              </button>
+
+            <div class="input-area">
+              <div class="slider-group" style="opacity: 0.8;">
+                <label>相手の返礼率 (設定済み)</label>
+                <span class="readonly-value" id="g-bot-rate-fixed">50%</span>
+              </div>
+              
+              <div class="slider-group">
+                <label>あなたの贈与額を設定</label>
+                <div class="slider-container">
+                  <span>0</span>
+                  <input type="range" id="g-invest" min="0" max="{{ Constants.INVESTMENT_MAX }}" value="500">
+                  <span class="slider-value" id="g-invest-display">500 pt</span>
+                </div>
+                <p style="font-size:0.85em; color:#666; margin-top:4px;">
+                  (相手に届く額: <span id="g-received-display">1500</span> pt)
+                </p>
+              </div>
+            </div>
+
+            <div class="action-footer">
+              <button type="button" class="btn btn-primary" id="btn-calc-giver">結果を見る</button>
             </div>
           </div>
+
+          <div class="card-face back">
+            <div class="sim-card-header">シミュレーション結果</div>
+            
+            <div class="result-area">
+              <div class="result-row">
+                <p>あなたの手元に残った額</p>
+                <span class="highlight" id="g-res-keep">--</span> pt
+              </div>
+              <div class="arrow" style="transform: rotate(90deg); margin: -10px 0;">+</div>
+              <div class="result-row">
+                <p>相手からの返礼</p>
+                <span class="highlight" id="g-res-return">--</span> pt
+                <br><span style="font-size:0.8em; color:#666;">(相手に届いた額の <span id="g-res-rate">--</span>% )</span>
+              </div>
+              <div class="arrow" style="transform: rotate(90deg); margin: -10px 0;">=</div>
+              <div class="result-row" style="border-color: #3B95C4; background-color:#F0F8FF;">
+                <p>あなたの最終利得</p>
+                <span class="highlight" style="font-size: 1.5em;" id="g-res-total">--</span> pt
+              </div>
+            </div>
+
+            <div class="action-footer">
+              <button type="button" class="btn btn-secondary" id="btn-reset-giver">もう一度試す</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="sim-card-flipper" id="flipper-receiver">
+        <div class="sim-card-inner">
           
-          <div class="sim-result-area" id="receiver-result-area">
-            <h4>計算結果 (返礼する側)</h4>
-            <p>1. あなたには <span class="calc-value" data-id="received_by_you">0</span> pt が届きました。</p>
-            <p>2. あなたは <span class="calc-value" data-id="return_amount">0</span> pt を返礼しました。</p>
-            <p class="final-gain">
-              あなたの最終利得: (届いた額 <span data-id="received_by_you">0</span>) - (返礼 <span data-id="return_amount">0</span>) = <span class="calc-value" data-id="final_payoff">0</span> pt
-            </p>
+          <div class="card-face front">
+            <div class="sim-card-header">練習2：あなたが「返礼する側」</div>
+            
+            <div class="visual-flow">
+              <div class="mini-profile">
+                <div class="icon icon-bot"><svg><use xlink:href="#icon-person"></use></svg></div>
+                <span>練習相手</span>
+              </div>
+              <div class="arrow">→</div>
+              <div class="mini-profile">
+                <div class="icon icon-user"><svg><use xlink:href="#icon-person"></use></svg></div>
+                <span>あなた</span>
+              </div>
+            </div>
+
+            <div class="input-area">
+              <div class="slider-group" style="opacity: 0.8;">
+                <label>相手からの贈与額 (設定済み)</label>
+                <span class="readonly-value" id="r-bot-gift-fixed">500 pt</span>
+                <p style="font-size:0.85em; color:#666; margin-top:4px;">
+                  (あなたに届く額: <span id="r-received-display" style="font-weight:bold; color:#3B95C4;">1500</span> pt)
+                </p>
+              </div>
+              
+              <div class="slider-group">
+                <label>あなたの返礼額を設定</label>
+                <div class="slider-container">
+                  <span>0</span>
+                  <input type="range" id="r-return" min="0" max="1500" value="750">
+                  <span class="slider-value" id="r-return-display">750 pt</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="action-footer">
+              <button type="button" class="btn btn-primary" id="btn-calc-receiver">結果を見る</button>
+            </div>
           </div>
+
+          <div class="card-face back">
+            <div class="sim-card-header">シミュレーション結果</div>
+            
+            <div class="result-area">
+              <div class="result-row">
+                <p>あなたに届いた額</p>
+                <span class="highlight" id="r-res-received">--</span> pt
+              </div>
+              <div class="arrow" style="transform: rotate(90deg); margin: -10px 0;">-</div>
+              <div class="result-row">
+                <p>相手への返礼</p>
+                <span class="highlight" id="r-res-return">--</span> pt
+              </div>
+              <div class="arrow" style="transform: rotate(90deg); margin: -10px 0;">=</div>
+              <div class="result-row" style="border-color: #3B95C4; background-color:#F0F8FF;">
+                <p>あなたの最終利得</p>
+                <span class="highlight" style="font-size: 1.5em;" id="r-res-total">--</span> pt
+              </div>
+            </div>
+
+            <div class="action-footer">
+              <button type="button" class="btn btn-secondary" id="btn-reset-receiver">もう一度試す</button>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -232,112 +384,138 @@
   <script src="{% static 'common.js' %}"></script>
   <script>
     (function() {
-      // --- スライダーと数値表示の連動 ---
-      const investSlider = document.getElementById('invest-slider');
-      const investDisplay = document.getElementById('invest-value-display');
-      const returnSlider = document.getElementById('return-slider');
-      const returnDisplay = document.getElementById('return-value-display');
-
-      investSlider.addEventListener('input', () => {
-        investDisplay.textContent = investSlider.value;
-      });
-      returnSlider.addEventListener('input', () => {
-        returnDisplay.textContent = returnSlider.value;
-      });
-
-      // --- 練習1 (贈る側) ---
-      const determineGiverBtn = document.getElementById('determine-giver-bot-btn');
-      const giverBehaviorDisplay = document.getElementById('giver-bot-behavior-display');
-      const giverSpeechBubble = document.getElementById('giver-bot-speech-bubble');
-      const giverSimulationArea = document.getElementById('giver-simulation-area');
-      const calculateGiverBtn = document.getElementById('calculate-giver-btn');
-      const giverResultArea = document.getElementById('giver-result-area');
       
-      // 1-1. Botの返礼率を決めるボタン
-      determineGiverBtn.addEventListener('click', () => {
-        liveSend_determine_bot_giver({});
-        // ボタンを無効化（リロードするまで再決定不可）
-        determineGiverBtn.disabled = true;
-        determineGiverBtn.textContent = 'ルール決定中...';
-      });
+      // 定数
+      const MULTIPLIER = {{ Constants.MULTIPLIER }};
+      const INVESTMENT_MAX = {{ Constants.INVESTMENT_MAX }};
 
-      // 1-2. 贈与シミュレーションボタン
-      calculateGiverBtn.addEventListener('click', () => {
-        const investment = parseInt(investSlider.value);
-        liveSend_calculate_giver({ investment: investment });
-      });
+      // ------------------------------------------
+      // 1. 設定カード (Settings) の制御
+      // ------------------------------------------
+      const setBotRateSlider = document.getElementById('setting-bot-rate');
+      const setBotRateDisplay = document.getElementById('setting-bot-rate-display');
+      const setBotGiftSlider = document.getElementById('setting-bot-gift');
+      const setBotGiftDisplay = document.getElementById('setting-bot-gift-display');
 
-      // --- 練習2 (返礼する側) ---
-      const determineReceiverBtn = document.getElementById('determine-receiver-bot-btn');
-      const receiverBehaviorDisplay = document.getElementById('receiver-bot-behavior-display');
-      const receiverSpeechBubble = document.getElementById('receiver-bot-speech-bubble');
-      const receiverSimulationArea = document.getElementById('receiver-simulation-area');
-      const calculateReceiverBtn = document.getElementById('calculate-receiver-btn');
-      const receiverResultArea = document.getElementById('receiver-result-area');
+      // 練習カード側の表示要素 (固定値)
+      const gBotRateFixed = document.getElementById('g-bot-rate-fixed');
+      const rBotGiftFixed = document.getElementById('r-bot-gift-fixed');
       
-      // 2-1. Botの贈与額を決めるボタン
-      determineReceiverBtn.addEventListener('click', () => {
-        liveSend_determine_bot_receiver({});
-        determineReceiverBtn.disabled = true;
-        determineReceiverBtn.textContent = '贈与額を決定中...';
+      // 設定変更時の処理
+      function updateSettings() {
+        // 返礼率の更新
+        const rateVal = setBotRateSlider.value;
+        setBotRateDisplay.textContent = rateVal + '%';
+        gBotRateFixed.textContent = rateVal + '%'; // 練習1カードへ反映
+
+        // 贈与額の更新
+        const giftVal = setBotGiftSlider.value;
+        setBotGiftDisplay.textContent = giftVal + ' pt';
+        rBotGiftFixed.textContent = giftVal + ' pt'; // 練習2カードへ反映
+
+        // ★ 重要: 練習2（Receiver）の計算基準値も更新する
+        updateReceiverInputs(); 
+      }
+
+      setBotRateSlider.addEventListener('input', updateSettings);
+      setBotGiftSlider.addEventListener('input', updateSettings);
+
+
+      // ------------------------------------------
+      // 2. 練習1: 贈る側 (Giver) の制御
+      // ------------------------------------------
+      const gFlipper = document.getElementById('flipper-giver');
+      const gInvestSlider = document.getElementById('g-invest');
+      const gInvestDisplay = document.getElementById('g-invest-display');
+      const gReceivedDisplay = document.getElementById('g-received-display');
+      
+      // スライダー連動
+      gInvestSlider.addEventListener('input', () => {
+        const val = parseInt(gInvestSlider.value);
+        gInvestDisplay.textContent = val + ' pt';
+        gReceivedDisplay.textContent = val * MULTIPLIER;
       });
 
-      // 2-2. 返礼シミュレーションボタン
-      calculateReceiverBtn.addEventListener('click', () => {
-        const returnAmount = parseInt(returnSlider.value);
-        liveSend_calculate_receiver({ return_amount: returnAmount });
+      // 計算＆フリップ
+      document.getElementById('btn-calc-giver').addEventListener('click', () => {
+        const investment = parseInt(gInvestSlider.value);
+        const ratePercent = parseInt(setBotRateSlider.value); // 設定カードから値を取得
+        
+        const yourKeep = INVESTMENT_MAX - investment;
+        const receivedByBot = investment * MULTIPLIER;
+        const botReturn = Math.floor(receivedByBot * (ratePercent / 100));
+        const totalGain = yourKeep + botReturn;
+
+        // 結果表示を更新
+        document.getElementById('g-res-keep').textContent = yourKeep;
+        document.getElementById('g-res-return').textContent = botReturn;
+        document.getElementById('g-res-rate').textContent = ratePercent;
+        document.getElementById('g-res-total').textContent = totalGain;
+
+        // カードを裏返す
+        gFlipper.classList.add('is-flipped');
       });
 
-      // --- Pythonからの計算結果を受け取る共通の関数 ---
-      function liveRecv(data) {
-        console.log("Pythonから結果受信:", data);
-        
-        if (data.type === 'bot_giver_determined') {
-          // 練習1: Botの返礼率が決定した
-          giverSpeechBubble.textContent = `「届いた額の ${data.rate_percent}% を返礼します」`;
-          giverBehaviorDisplay.style.display = 'flex';
-          giverSimulationArea.style.display = 'block';
-          determineGiverBtn.textContent = `ルール決定 ( ${data.rate_percent}% )`;
+      // リセット
+      document.getElementById('btn-reset-giver').addEventListener('click', () => {
+        gFlipper.classList.remove('is-flipped');
+      });
 
-        } else if (data.type === 'giver_result') {
-          // 練習1: シミュレーション結果
-          updateResultArea(giverResultArea, data);
-          giverResultArea.style.display = 'block';
-        
-        } else if (data.type === 'bot_receiver_determined') {
-          // 練習2: Botの贈与額が決定した
-          receiverSpeechBubble.textContent = `「あなたに ${data.gift_amount} pt 贈ります」`;
-          document.getElementById('received-by-you-display').textContent = data.received_amount;
-          
-          // 返礼スライダーの最大値と初期値を設定
-          returnSlider.max = data.received_amount;
-          const initialReturn = Math.floor(data.received_amount / 2);
-          returnSlider.value = initialReturn;
-          returnDisplay.textContent = initialReturn;
 
-          receiverBehaviorDisplay.style.display = 'flex';
-          receiverSimulationArea.style.display = 'block';
-          determineReceiverBtn.textContent = `贈与額決定 ( ${data.gift_amount} pt )`;
-          
-        } else if (data.type === 'receiver_result') {
-          // 練習2: シミュレーション結果
-          updateResultArea(receiverResultArea, data);
-          receiverResultArea.style.display = 'block';
+      // ------------------------------------------
+      // 3. 練習2: 返礼する側 (Receiver) の制御
+      // ------------------------------------------
+      const rFlipper = document.getElementById('flipper-receiver');
+      const rReceivedDisplay = document.getElementById('r-received-display');
+      const rReturnSlider = document.getElementById('r-return');
+      const rReturnDisplay = document.getElementById('r-return-display');
+
+      // スライダー連動 (設定変更時にも呼ばれる)
+      function updateReceiverInputs() {
+        const gift = parseInt(setBotGiftSlider.value); // 設定カードから値を取得
+        const received = gift * MULTIPLIER;
+        
+        rReceivedDisplay.textContent = received;
+
+        // 返礼上限を更新
+        rReturnSlider.max = received;
+        
+        // もし現在の返礼額が上限を超えていたら修正
+        if (parseInt(rReturnSlider.value) > received) {
+          rReturnSlider.value = received;
         }
+        rReturnDisplay.textContent = rReturnSlider.value + ' pt';
       }
-      
-      // 結果エリアのHTMLを更新するヘルパー関数
-      function updateResultArea(areaElement, data) {
-        areaElement.querySelectorAll('[data-id]').forEach(span => {
-          const key = span.dataset.id;
-          if (data.hasOwnProperty(key)) {
-            span.textContent = data[key];
-          }
-        });
-      }
-      
-      // liveRecv関数をoTreeに登録
-      window.liveRecv = liveRecv;
+
+      rReturnSlider.addEventListener('input', () => {
+        rReturnDisplay.textContent = rReturnSlider.value + ' pt';
+      });
+
+      // 計算＆フリップ
+      document.getElementById('btn-calc-receiver').addEventListener('click', () => {
+        const gift = parseInt(setBotGiftSlider.value);
+        const received = gift * MULTIPLIER;
+        const returnVal = parseInt(rReturnSlider.value);
+        const totalGain = received - returnVal;
+
+        // 結果表示を更新
+        document.getElementById('r-res-received').textContent = received;
+        document.getElementById('r-res-return').textContent = returnVal;
+        document.getElementById('r-res-total').textContent = totalGain;
+
+        // カードを裏返す
+        rFlipper.classList.add('is-flipped');
+      });
+
+      // リセット
+      document.getElementById('btn-reset-receiver').addEventListener('click', () => {
+        rFlipper.classList.remove('is-flipped');
+      });
+
+      // ------------------------------------------
+      // 初期化
+      // ------------------------------------------
+      updateSettings(); // 初期値の反映
 
     })();
   </script>
