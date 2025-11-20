@@ -1,0 +1,137 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{# --- 共通CSS/JSの読み込み --- #}
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+  <style>
+    .content-area h4 {
+        font-size: 1.1em;
+        color: #000000;
+        margin-top: 24px;
+        margin-bottom: 8px;
+        border-left: 4px solid #3B95C4;
+        padding-left: 8px;
+    }
+  </style>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'common.js' %}"></script>
+{% endblock %}
+
+{# --- ページのタイトル --- #}
+{% block title %}
+  お返しゲーム説明
+{% endblock %}
+
+{# --- ページのメインコンテンツ --- #}
+{% block content %}
+
+  {# SVGアイコンの定義 (oTreeの `content` 内に書く) #}
+  <svg class="icon-svg">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+
+  <div class="experiment-container">
+    
+    <div class="progress-tabs">
+      <div class="tab-button active">実験の進捗</div>
+    </div>
+
+    <div class="progress-content">
+      <div class="progress-steps active" id="steps-role2">
+        <div class="step completed"><div class="step-number">1</div>同意取得</div>
+        <div class="step completed"><div class="step-number">2</div>実験概要説明</div>
+        <div class="step completed"><div class="step-number">3</div>お返しゲーム説明</div>
+        <div class="step current"><div class="step-number">4</div>タスク２説明</div>
+        <div class="step"><div class="step-number">5</div>アンケート</div>
+        <div class="step"><div class="step-number">6</div>報酬の確認</div>
+      </div>
+    </div>
+    
+    <div class="experiment-header">
+      
+      <div class="room-tabs">
+        <div>作業ルーム1</div>
+        <div>作業ルーム2</div>
+        <div class="active">全体ルーム</div> </div>
+      
+      <div class="header-right-panel">
+        <button type="button" class="rule-check-button" id="open-rules-modal">
+          ルールを確認する
+        </button>
+        <div class="user-profile">
+          <div class="icon icon-user">
+            <svg><use xlink:href="#icon-person"></use></svg>
+          </div>
+          <span class="name">あなた</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <h2 id="page-title">ステージ２：ルール説明</h2>
+
+      <p>
+        お返しゲームを誰を優遇するのかを選ぶ人（選ぶ人）とそれ以外の４名（選ばれる人）がそれぞれ１回ずつ行います。
+        ただし、その前にメッセージの送信と優先順位付けを行ってもらいます。
+      </p>
+
+      <div class="rule-box">
+        <h3>【メッセージの送信】</h3>
+        <p>
+          選ばれる人のうち１名だけが、選ぶ人に対してメッセージを送ることができます。<br>
+          実際に、誰が選ぶ人にメッセージを送ることができるのかは、ランダムに選ばれます。<br>
+        </p>
+        <p>
+          <strong>メッセージの内容は、他の人がどれくらい返礼するのかの予想です。</strong><br>
+          ただし、メッセージの中で言及することができるのは、１名だけです。<br>
+        </p>
+        <p>
+          <strong>選ばれる人たちは、高い優先順位を競争し合うライバルです。</strong><br>
+          どうすれば多くのポイントを獲得できるのかを良く考えるようにしてください。
+        </p>
+      </div>
+      
+      <div class="rule-box">
+        <h3>【優先順位付け】</h3>
+        <p>
+          誰かを優遇するのかを選べる人は、ステージ１と異なり<strong>お返しゲームで贈る側</strong>を担います。<br>
+          お返しゲームでやり取りされる額は、優先順位に応じて異なります。
+        <p>【やり取りするポイント】
+          <ul>
+            <li>１位：2000pt</li>
+            <li>２位：1500pt</li>
+            <li>３位：500pt</li>
+            <li>４位：100pt</li>
+          </ul>  
+        </p>  
+      </div>
+    
+      <p>
+        それではメッセージを作成してください。
+      </p>
+    </div>
+    
+    <div class="navigation-footer">
+      {% next_button %}
+    </div>
+
+  </div>
+
+  <div class="modal-overlay" id="rules-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>ルール確認</span>
+        <button class="close-button" id="close-rules-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="rules-modal-body">
+        <p>（現在、確認できるルールはありません）</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

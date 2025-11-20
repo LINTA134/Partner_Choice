@@ -1,0 +1,126 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{# --- 共通CSS/JSの読み込み --- #}
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+  <style>
+    .content-area h4 {
+        font-size: 1.1em;
+        color: #000000;
+        margin-top: 24px;
+        margin-bottom: 8px;
+        border-left: 4px solid #3B95C4;
+        padding-left: 8px;
+    }
+  </style>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'common.js' %}"></script>
+{% endblock %}
+
+{# --- ページのタイトル --- #}
+{% block title %}
+  お返しゲーム説明
+{% endblock %}
+
+{# --- ページのメインコンテンツ --- #}
+{% block content %}
+
+  {# SVGアイコンの定義 (oTreeの `content` 内に書く) #}
+  <svg class="icon-svg">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+
+  <div class="experiment-container">
+    
+    <div class="progress-tabs">
+      <div class="tab-button active">実験の進捗</div>
+    </div>
+
+    <div class="progress-content">
+      <div class="progress-steps active" id="steps-role2">
+        <div class="step completed"><div class="step-number">1</div>同意取得</div>
+        <div class="step completed"><div class="step-number">2</div>実験概要説明</div>
+        <div class="step completed"><div class="step-number">3</div>お返しゲーム説明</div>
+        <div class="step current"><div class="step-number">4</div>タスク２説明</div>
+        <div class="step"><div class="step-number">5</div>アンケート</div>
+        <div class="step"><div class="step-number">6</div>報酬の確認</div>
+      </div>
+    </div>
+    
+    <div class="experiment-header">
+      
+      <div class="room-tabs">
+        <div>作業ルーム1</div>
+        <div>作業ルーム2</div>
+        <div class="active">全体ルーム</div> </div>
+      
+      <div class="header-right-panel">
+        <button type="button" class="rule-check-button" id="open-rules-modal">
+          ルールを確認する
+        </button>
+        <div class="user-profile">
+          <div class="icon icon-user">
+            <svg><use xlink:href="#icon-person"></use></svg>
+          </div>
+          <span class="name">あなた</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="content-area">
+      <h2 id="page-title">説明</h2>
+
+      <p>
+        これからステージ１の本番を始めます。<br>
+        ステージ１ではお返しゲームを、２人とそれぞれ２回行ってもらいます。<br>
+      </p>
+
+      <div class="rule-box">
+        <h3>【注意点】</h3>
+        <ul>
+          <li>２回のうち、それぞれ自分が贈り物を贈る側、自分が返礼する側を１回ずつ行います。</li>
+          <li>自分が最初にどちらの側を担うのかはランダムです。</li>
+        </ul>
+        <p>
+          ステージ１では、1000pt のやり取りでしたが、ステージ２では異なります。<br>
+          ステージ２では、自分の優先順位に従ってやり取りするポイントが大きく異なります。<br>
+          <strong>どうすれば多くのポイントを獲得できるのかを良く考えるようにしてください。</strong><br>
+        <p>【やり取りするポイント】
+          <ul>
+            <li>１位：2000pt</li>
+            <li>２位：1500pt</li>
+            <li>３位：500pt</li>
+            <li>４位：100pt</li>
+          </ul>  
+        </p>  
+      </div>
+    
+      <p>
+        それでは実際にステージ１：お返しゲームを始めていきましょう。
+      </p>
+    </div>
+    
+    <div class="navigation-footer">
+      {% next_button %}
+    </div>
+
+  </div>
+
+  <div class="modal-overlay" id="rules-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>ルール確認</span>
+        <button class="close-button" id="close-rules-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="rules-modal-body">
+        <p>（現在、確認できるルールはありません）</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
