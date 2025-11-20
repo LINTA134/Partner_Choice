@@ -7,8 +7,8 @@ SESSION_CONFIGS = [
         num_demo_participants=1,
         app_sequence=[
             'App_01_Intro',
-            'App_02_MainTask',
-            'App_03_Questionnaire',
+            'App_02_Stage01',
+            'App_03_Stage02',
             'App_04_Debriefing',
         ],
     ),

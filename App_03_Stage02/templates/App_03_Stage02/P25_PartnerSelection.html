@@ -1,0 +1,326 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+  <style>
+    /* --- P_PartnerSelection 固有スタイル --- */
+    
+    /* 1. 情報まとめセクション */
+    .info-summary-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .info-summary-container .gossip-illustrator {
+      margin: 0;
+      background-color: #F9F9F9;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* 2. 優先順位付け (D&D) */
+    .dropzone-container {
+      display: flex;
+      justify-content: space-around;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .dropzone {
+      flex: 1;
+      height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 12px;
+      border: 2px dashed #E0E0E0;
+      border-radius: 8px;
+      background-color: #fff;
+      transition: background-color 0.2s;
+    }
+    .dropzone.is-filled {
+      border-style: solid;
+      border-color: #ccc;
+    }
+    .dropzone .rank-label {
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #000000;
+      margin-bottom: 12px;
+    }
+    
+    /* 順位ごとの色分け */
+    .dropzone[data-rank="1"] .rank-label { color: #D4AF37; } /* 金 */
+    .dropzone[data-rank="2"] .rank-label { color: #C0C0C0; } /* 銀 */
+    .dropzone[data-rank="3"] .rank-label { color: #CD7F32; } /* 銅 */
+
+    .draggable-container {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 16px;
+      padding: 16px;
+      border: 1px solid #E0E0E0;
+      border-radius: 8px;
+      background-color: #F9F9F9;
+      min-height: 140px; /* カードが収まる高さ */
+    }
+    
+    /* 3. 贈与額決定 (スライダー) */
+    .decision-block {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #F0F0F0;
+    }
+    .decision-block:last-child { border-bottom: none; margin-bottom: 0; }
+    .decision-block .player-label {
+      flex-basis: 120px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .decision-block .slider-area { flex: 1; }
+    .decision-block .slider-container { padding: 0 8px; display: flex; align-items: center; gap: 12px; }
+    .decision-block .slider-container input { flex: 1; }
+    .decision-block .slider-value { font-weight: bold; color: #3B95C4; width: 40px; text-align: right; }
+    
+    .distribute-display-simple {
+      font-size: 0.9em;
+      color: #454545;
+      text-align: center;
+      margin-top: 8px;
+    }
+    
+    /* エラーメッセージ */
+    #validation-error-message {
+      color: #D9534F; font-weight: bold; text-align: center; margin-top: 16px; display: none;
+    }
+  </style>
+{% endblock %}
+
+{% block title %}タスク２：意思決定{% endblock %}
+
+{% block content %}
+
+  <div class="experiment-container">
+    
+    <div class="progress-tabs">
+      <div class="tab-button active">あなたの進捗</div>
+    </div>
+
+    <div class="content-area">
+      <h2>タスク２：意思決定</h2>
+      <p>
+        これまでの情報を参考に、4名の「パートナーの優先順位」と、4名それぞれへの「贈り物の額」を決定してください。<br>
+        あなたの決定に基づき、報酬が計算されます。
+      </p>
+
+      <div class="rule-box">
+        <h3>【情報のまとめ】</h3>
+        <div class="info-summary-container">
+          
+          <div class="member-profile-container">
+            <div class="profile-card">
+              <div class="icon {{ bots.A.icon_class }}"><svg><use xlink:href="#icon-person"></use></svg></div>
+              <span class="name">{{ bots.A.name }}</span>
+              <span class="reputation-display" style="font-weight: bold; display: block; margin-top: 8px; color: #3B95C4;">平均 {{ rep_A }} pt</span>
+            </div>
+            <div class="profile-card">
+              <div class="icon {{ bots.B.icon_class }}"><svg><use xlink:href="#icon-person"></use></svg></div>
+              <span class="name">{{ bots.B.name }}</span>
+              <span class="reputation-display" style="font-weight: bold; display: block; margin-top: 8px; color: #D9534F;">平均 {{ rep_B }} pt</span>
+            </div>
+            <div class="profile-card">
+              <div class="icon {{ bots.C.icon_class }}"><svg><use xlink:href="#icon-person"></use></svg></div>
+              <span class="name">{{ bots.C.name }}</span>
+              <span class="reputation-display" style="font-weight: bold; display: block; margin-top: 8px;">？？？</span>
+            </div>
+            <div class="profile-card">
+              <div class="icon {{ bots.X.icon_class }}"><svg><use xlink:href="#icon-person"></use></svg></div>
+              <span class="name">{{ bots.X.name }}</span>
+              <span class="reputation-display" style="font-weight: bold; display: block; margin-top: 8px;">？？？</span>
+            </div>
+          </div>
+
+          <div class="gossip-illustrator">
+            <div class="profile-card">
+              <div class="icon {{ gossip_sender_icon_class }}"><svg><use xlink:href="#icon-person"></use></svg></div>
+              <span class="name">{{ gossip_sender_name }}</span>
+            </div>
+            <div class="speech-bubble">
+              「{{ bots.X.name }}は{{ gossip_content_text }}」
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rule-box">
+        <h3>【1. パートナーの優先順位】</h3>
+        <p style="text-align: center;">下の4名のアイコンを、上の1位〜4位の枠にドラッグ＆ドロップで配置してください。</p>
+        
+        <div class="dropzone-container">
+          <div class="dropzone" data-rank="1"><span class="rank-label">1位</span></div>
+          <div class="dropzone" data-rank="2"><span class="rank-label">2位</span></div>
+          <div class="dropzone" data-rank="3"><span class="rank-label">3位</span></div>
+          <div class="dropzone" data-rank="4"><span class="rank-label">4位</span></div>
+        </div>
+        
+        <div class="draggable-container" id="draggable-container">
+          <div class="profile-card draggable" draggable="true" data-player-id="A">
+            <div class="icon {{ bots.A.icon_class }}"><svg><use xlink:href="#icon-person"></use></svg></div>
+            <span class="name">{{ bots.A.name }}</span>
+          </div>
+          <div class="profile-card draggable" draggable="true" data-player-id="B">
+            <div class="icon {{ bots.B.icon_class }}"><svg><use xlink:href="#icon-person"></use></svg></div>
+            <span class="name">{{ bots.B.name }}</span>
+          </div>
+          <div class="profile-card draggable" draggable="true" data-player-id="C">
+            <div class="icon {{ bots.C.icon_class }}"><svg><use xlink:href="#icon-person"></use></svg></div>
+            <span class="name">{{ bots.C.name }}</span>
+          </div>
+          <div class="profile-card draggable" draggable="true" data-player-id="X">
+            <div class="icon {{ bots.X.icon_class }}"><svg><use xlink:href="#icon-person"></use></svg></div>
+            <span class="name">{{ bots.X.name }}</span>
+          </div>
+        </div>
+        
+        <div id="validation-error-message">
+          すべてのパートナーを1位〜4位の枠に配置してください。
+        </div>
+      </div>
+
+      <div class="rule-box">
+        <h3>【2. 贈り物の額（信頼投資額）】</h3>
+        <p style="text-align: center;">4名それぞれに対して、お返しゲームで贈る額（0〜100pt）を決定してください。</p>
+        
+        <div class="decision-block">
+          <div class="player-label">{{ bots.A.name }}</div>
+          <div class="slider-area">
+            <div class="slider-container">
+              <span>0</span>
+              <input type="range" class="invest-slider" name="invest_A" min="0" max="100" value="50">
+              <span class="slider-value">50</span> pt
+            </div>
+            <div class="distribute-display-simple">あなたの取り分: 50 pt / 相手に届く額: 150 pt</div>
+          </div>
+        </div>
+
+        <div class="decision-block">
+          <div class="player-label">{{ bots.B.name }}</div>
+          <div class="slider-area">
+            <div class="slider-container">
+              <span>0</span>
+              <input type="range" class="invest-slider" name="invest_B" min="0" max="100" value="50">
+              <span class="slider-value">50</span> pt
+            </div>
+            <div class="distribute-display-simple">あなたの取り分: 50 pt / 相手に届く額: 150 pt</div>
+          </div>
+        </div>
+        
+        <div class="decision-block">
+          <div class="player-label">{{ bots.C.name }}</div>
+          <div class="slider-area">
+            <div class="slider-container">
+              <span>0</span>
+              <input type="range" class="invest-slider" name="invest_C" min="0" max="100" value="50">
+              <span class="slider-value">50</span> pt
+            </div>
+            <div class="distribute-display-simple">あなたの取り分: 50 pt / 相手に届く額: 150 pt</div>
+          </div>
+        </div>
+        
+        <div class="decision-block">
+          <div class="player-label">{{ bots.X.name }}</div>
+          <div class="slider-area">
+            <div class="slider-container">
+              <span>0</span>
+              <input type="range" class="invest-slider" name="invest_X" min="0" max="100" value="50">
+              <span class="slider-value">50</span> pt
+            </div>
+            <div class="distribute-display-simple">あなたの取り分: 50 pt / 相手に届く額: 150 pt</div>
+          </div>
+        </div>
+      </div>
+
+      <input type="hidden" name="rank_1_partner" id="id_rank_1_partner">
+      <input type="hidden" name="rank_2_partner" id="id_rank_2_partner">
+      <input type="hidden" name="rank_3_partner" id="id_rank_3_partner">
+      <input type="hidden" name="rank_4_partner" id="id_rank_4_partner">
+
+    </div>
+    
+    <div class="navigation-footer">
+      <button type="button" class="btn btn-primary" id="btn-submit">意思決定を確定する</button>
+    </div>
+  </div>
+
+  <svg class="icon-svg" style="display:none;">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'common.js' %}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      
+      // 1. ドラッグ＆ドロップの初期化 (common.js依存)
+      window.DragDropController.init('.draggable', '.dropzone', '#draggable-container');
+
+      // 2. スライダーの連動設定
+      const sliders = document.querySelectorAll('.invest-slider');
+      sliders.forEach(slider => {
+        const container = slider.closest('.slider-area');
+        const valueDisplay = container.querySelector('.slider-value');
+        const distDisplay = container.querySelector('.distribute-display-simple');
+        
+        function updateDisplay() {
+          const invest = parseInt(slider.value);
+          const gain = 100 - invest;
+          const received = invest * 3;
+          valueDisplay.textContent = invest;
+          distDisplay.textContent = `あなたの取り分: ${gain} pt / 相手に届く額: ${received} pt`;
+        }
+        
+        slider.addEventListener('input', updateDisplay);
+        updateDisplay(); // 初期表示
+      });
+
+      // 3. 送信ボタン処理
+      document.getElementById('btn-submit').addEventListener('click', function(e) {
+        const state = window.DragDropController.getState();
+        const errorMsg = document.getElementById('validation-error-message');
+
+        // ランキングが完了しているかチェック
+        if (!state.isComplete()) {
+          errorMsg.style.display = 'block';
+          errorMsg.scrollIntoView({behavior: 'smooth', block: 'center'});
+          return;
+        }
+
+        // 隠しフィールドにランキング結果をセット
+        // state.ranks は { "1": "A", "2": "B" ... } という形式
+        document.getElementById('id_rank_1_partner').value = state.ranks['1'];
+        document.getElementById('id_rank_2_partner').value = state.ranks['2'];
+        document.getElementById('id_rank_3_partner').value = state.ranks['3'];
+        document.getElementById('id_rank_4_partner').value = state.ranks['4'];
+
+        // 投資額(input[name="invest_X"])は通常のフォーム送信でoTreeに送られるため処理不要
+
+        // フォーム送信
+        document.querySelector('form').submit();
+      });
+
+    });
+  </script>
+{% endblock %}
