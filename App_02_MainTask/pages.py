@@ -1,134 +1,265 @@
 from otree.api import Page
-from .models import Constants, Player
-#from App_01_Intro.models import Constants as App01Constants
+from .models import Constants
 
-# ----------------------------------------
-# ページ 15: 贈り物ゲーム待機 (演出)
-# ----------------------------------------
-class P15_Wait_Game1(Page):
-    timeout_seconds = 3 # 3秒間 演出
-    show_countdown = False
+# -------------------------------------------------------
+# Page 6: 説明 (今回はスキップ/使い回しとのことなので枠のみ)
+# -------------------------------------------------------
+class P7_MatchingInstruction(Page):
 
     def is_displayed(self):
         return self.participant.vars.get('consent_rejected') is None
 
-# ----------------------------------------
-# ページ 16: メッセージ作成ルール説明
-# ----------------------------------------
-class P16_MessageInstruction(Page):
 
+class P8_MatchingWait(Page):
+    # 5秒間、自動でこのページに留まらせる (演出のため)
+    timeout_seconds = 3
+    timer_text = "相手が決定するまでお待ちください"
+
+    # 同意した人だけ表示 (同意しなかった人はこのAppの以降のページをすべてスキップ)
     def is_displayed(self):
         return self.participant.vars.get('consent_rejected') is None
 
-# ----------------------------------------
-# ページ 17: メッセージ待機 (演出)
-# ----------------------------------------
-class P17_Wait_Message(Page):
-    timeout_seconds = 3 # 3秒間 演出
-    show_countdown = False
-    
-    def is_displayed(self):
-        return self.participant.vars.get('consent_rejected') is None
+# -------------------------------------------------------
+# Page 7: 1人目(Aさん) - Receiver役 (Botからの贈り物)
+# -------------------------------------------------------
+class P9_Game1_Receiver_Wait(Page):
+    timeout_seconds = 30
+    timer_text = "相手が決定するまでお待ちください"
 
-# ----------------------------------------
-# ページ 18: 評判とゴシップの開示 (★独立変数の操作★)
-# ----------------------------------------
-class P18_Reputation_Gossip(Page):
-    
     def vars_for_template(self):
-        # App_01で保存した'condition'変数を取得
-        condition = self.participant.vars.get('condition')
-        
-        # Botの基本情報をHTMLに渡す
-        bot_a_info = Constants.BOTS_INFO['A']
-        bot_b_info = Constants.BOTS_INFO['B']
-        bot_c_info = Constants.BOTS_INFO['C']
-        
-        # 条件分岐
-        if condition == 'cooperative':
-            gossiper_name = bot_a_info['name'] # レッドさん
-            gossiper_reputation = bot_a_info['reputation_jp']
-        else: # condition == 'selfish'
-            gossiper_name = bot_b_info['name'] # シアンさん
-            gossiper_reputation = bot_b_info['reputation_jp']
-            
         return {
-            'bot_A_name': bot_a_info['name'],
-            'bot_A_reputation': bot_a_info['reputation_jp'],
-            'bot_B_name': bot_b_info['name'],
-            'bot_B_reputation': bot_b_info['reputation_jp'],
-            'bot_C_name': bot_c_info['name'],
-            'bot_C_reputation': bot_c_info['reputation_jp'],
-            'gossiper_name': gossiper_name,
-            'gossip_content': Constants.GOSSIP_CONTENT,
-            'condition' : condition,
+            'bot': Constants.BOT_A,
+            'multiplier': Constants.MULTIPLIER,
+            'initial_endowment': Constants.INVESTMENT_MAX,
         }
 
+    def before_next_page(self):
+        # 記録用: Botの贈与額を保存
+        bot_gift = Constants.BOT_A['gift_amount']
+        multiplier = Constants.MULTIPLIER
+        received = bot_gift * multiplier
+        self.player.g1_bot_gift = bot_gift
+        self.player.g1_recieved = received
+
+
     def is_displayed(self):
         return self.participant.vars.get('consent_rejected') is None
 
-# ----------------------------------------
-# ページ 19: 本番の意思決定 (★従属変数の取得★)
-# ----------------------------------------
-class P19_Decision(Page):
+# -------------------------------------------------------
+# Page 8: 1人目(Aさん) - Sender役 (あなたが贈り物)
+# -------------------------------------------------------
+class P10_Game1_Receiver_Decision(Page):
     form_model = 'player'
-    # ★ models.py で定義した8つのフィールドすべてを保存対象にする
-    form_fields = [
-        'investment_A', 'investment_B', 'investment_C', 'investment_X',
-        'rank_A', 'rank_B', 'rank_C', 'rank_X'
-    ]
+    form_fields = ['g1_return']
 
     def vars_for_template(self):
-        # --- 1. 定数を辞書として取得 ---
-        bots = Constants.BOTS_INFO 
-        gossip_content_text = Constants.GOSSIP_CONTENT
+        # 受け取る額を計算して渡す
+        received = self.player.g1_recieved
         
-        # --- 2. 条件分岐 (P18 と同じロジック) ---
-        condition = self.participant.vars.get('condition') # デフォルト
-        print(condition)
-        
-        if condition == 'cooperative':
-            gossip_sender_name = bots['A']['name']
-            gossip_sender_icon_class = 'icon-a'
-        else: # 'selfish'
-            gossip_sender_name = bots['B']['name']
-            gossip_sender_icon_class = 'icon-b'
-            
-        # --- 3. HTMLテンプレートに変数を渡す ---
-        return dict(
-            rep_A = bots['A']['reputation_val'],
-            rep_B = bots['B']['reputation_val'],
-            gossip_sender_name = gossip_sender_name,
-            gossip_sender_icon_class = gossip_sender_icon_class,
-            gossip_content_text = gossip_content_text,
-        )
+        return {
+            'bot': Constants.BOT_A,
+            'multiplier': Constants.MULTIPLIER,
+            'received_amount': received,
+            'initial_endowment': Constants.INVESTMENT_MAX,
+        }
+    
+    def is_displayed(self):
+        return self.participant.vars.get('consent_rejected') is None
 
-    def error_message(self, values):
-        # --- 4. サーバーサイドでの順位バリデーション ---
-        # (models.pyのコメントにあった通り)
-        ranks_input = [values['rank_A'], values['rank_B'], values['rank_C'], values['rank_X']]
-        
-        # 0 が含まれている (D&Dが未完了)
-        if 0 in ranks_input:
-            return 'すべてのパートナーを1位〜4位の枠に配置してください。'
-            
-        # 重複がある
-        if len(set(ranks_input)) != 4:
-            return 'パートナーの順位が重複しています。1位から4位までを重複なく割り当ててください。'
-            
-        # 1-4 の範囲外 (念のため)
-        if not all(1 <= r <= 4 for r in ranks_input):
-             return '順位は1位から4位の間で指定してください。'
+class P11_Game1_Sender_Decision(Page):
+    form_model = 'player'
+    form_fields = ['g1_gift']
+
+    def vars_for_template(self):
+        return {
+            'bot': Constants.BOT_A,
+            'multiplier': Constants.MULTIPLIER,
+            'initial_endowment': Constants.INVESTMENT_MAX,
+        }
+    
+    def is_displayed(self):
+        return self.participant.vars.get('consent_rejected') is None
+
+# -------------------------------------------------------
+# Page 8b: 1人目(Aさん) - 相手の意思決定 (待機)
+# -------------------------------------------------------
+class P12_Game1_Sender_Wait(Page):
+    # ★ 20秒経過で自動的に次のページへ
+    timeout_seconds = 30
+    timer_text = "相手が決定するまでお待ちください"
+
+    def vars_for_template(self):
+        return {
+            'bot': Constants.BOT_A,
+        }
+
+    def before_next_page(self):
+        # Botの返礼額を計算して保存
+        invest = self.player.g1_gift
+        received = invest * Constants.MULTIPLIER
+        bot_return = int(received * Constants.BOT_A['return_rate'])
+        self.player.g1_bot_return = bot_return
+        self.player.g1_bot_recieved = received
 
     def is_displayed(self):
         return self.participant.vars.get('consent_rejected') is None
 
-# ----------------------------------------
-# ページ遷移の定義
-# ----------------------------------------
+# -------------------------------------------------------
+# Page 8c: 1人目(Aさん) - 結果表示
+# -------------------------------------------------------
+class P13_Game1_Sender_Result(Page):
+    def vars_for_template(self):
+        invest = self.player.g1_gift
+        bot_return = self.player.g1_bot_return
+        received = self.player.g1_bot_recieved
+        initial = Constants.INVESTMENT_MAX
+        
+        your_keep = initial - invest
+        final_gain = your_keep + bot_return
+        
+        return {
+            'bot': Constants.BOT_A,
+            'initial_endowment': initial,
+            'invest': invest,
+            'bot_recieved': received,
+            'bot_return': bot_return,
+            'final_gain': final_gain,
+        }
+    
+    def is_displayed(self):
+        return self.participant.vars.get('consent_rejected') is None
+
+class P14_MatchingWait(Page):
+    # 5秒間、自動でこのページに留まらせる (演出のため)
+    timeout_seconds = 3
+    timer_text = "相手が決定するまでお待ちください"
+
+    # 同意した人だけ表示 (同意しなかった人はこのAppの以降のページをすべてスキップ)
+    def is_displayed(self):
+        return self.participant.vars.get('consent_rejected') is None
+
+# -------------------------------------------------------
+# Page 7: 2人目(Bさん) - Receiver役 (Botからの贈り物)
+# -------------------------------------------------------
+class P15_Game2_Receiver_Wait(Page):
+    timeout_seconds = 30
+    timer_text = "相手が決定するまでお待ちください"
+
+    def vars_for_template(self):
+        return {
+            'bot': Constants.BOT_B,
+            'multiplier': Constants.MULTIPLIER,
+            'initial_endowment': Constants.INVESTMENT_MAX,
+        }
+
+    def before_next_page(self):
+        # 記録用: Botの贈与額を保存
+        bot_gift = Constants.BOT_B['gift_amount']
+        multiplier = Constants.MULTIPLIER
+        received = bot_gift * multiplier
+        self.player.g2_bot_gift = bot_gift
+        self.player.g2_recieved = received
+
+
+    def is_displayed(self):
+        return self.participant.vars.get('consent_rejected') is None
+
+# -------------------------------------------------------
+# Page 8: 2人目(Bさん) - Sender役 (あなたが贈り物)
+# -------------------------------------------------------
+class P16_Game2_Receiver_Decision(Page):
+    form_model = 'player'
+    form_fields = ['g2_return']
+
+    def vars_for_template(self):
+        # 受け取る額を計算して渡す
+        received = self.player.g2_recieved
+        
+        return {
+            'bot': Constants.BOT_B,
+            'multiplier': Constants.MULTIPLIER,
+            'received_amount': received,
+            'initial_endowment': Constants.INVESTMENT_MAX,
+        }
+    
+    def is_displayed(self):
+        return self.participant.vars.get('consent_rejected') is None
+
+class P17_Game2_Sender_Decision(Page):
+    form_model = 'player'
+    form_fields = ['g2_gift']
+
+    def vars_for_template(self):
+        return {
+            'bot': Constants.BOT_B,
+            'multiplier': Constants.MULTIPLIER,
+            'initial_endowment': Constants.INVESTMENT_MAX,
+        }
+    
+    def is_displayed(self):
+        return self.participant.vars.get('consent_rejected') is None
+
+# -------------------------------------------------------
+# Page 8b: 2人目(Bさん) - 相手の意思決定 (待機)
+# -------------------------------------------------------
+class P18_Game2_Sender_Wait(Page):
+    # ★ 20秒経過で自動的に次のページへ
+    timeout_seconds = 30
+    timer_text = "相手が決定するまでお待ちください"
+
+    def vars_for_template(self):
+        return {
+            'bot': Constants.BOT_B,
+        }
+
+    def before_next_page(self):
+        # Botの返礼額を計算して保存
+        invest = self.player.g2_gift
+        received = invest * Constants.MULTIPLIER
+        bot_return = int(received * Constants.BOT_B['return_rate'])
+        self.player.g2_bot_return = bot_return
+        self.player.g2_bot_recieved = received
+
+    def is_displayed(self):
+        return self.participant.vars.get('consent_rejected') is None
+
+# -------------------------------------------------------
+# Page 8c: 2人目(Bさん) - 結果表示
+# -------------------------------------------------------
+class P19_Game2_Sender_Result(Page):
+    def vars_for_template(self):
+        invest = self.player.g2_gift
+        bot_return = self.player.g2_bot_return
+        received = self.player.g2_bot_recieved
+        initial = Constants.INVESTMENT_MAX
+        
+        your_keep = initial - invest
+        final_gain = your_keep + bot_return
+        
+        return {
+            'bot': Constants.BOT_B,
+            'initial_endowment': initial,
+            'invest': invest,
+            'bot_recieved': received,
+            'bot_return': bot_return,
+            'final_gain': final_gain,
+        }
+    
+    def is_displayed(self):
+        return self.participant.vars.get('consent_rejected') is None
+
 page_sequence = [
-    P15_Wait_Game1,
-    P17_Wait_Message,
-    P18_Reputation_Gossip,
-    P19_Decision,
+    P7_MatchingInstruction,
+    P8_MatchingWait,
+    P9_Game1_Receiver_Wait,
+    P10_Game1_Receiver_Decision,
+    P11_Game1_Sender_Decision,
+    P12_Game1_Sender_Wait,
+    P13_Game1_Sender_Result,
+    P14_MatchingWait,
+    P15_Game2_Receiver_Wait,
+    P16_Game2_Receiver_Decision,
+    P17_Game2_Sender_Decision,
+    P18_Game2_Sender_Wait,
+    P19_Game2_Sender_Result,
 ]

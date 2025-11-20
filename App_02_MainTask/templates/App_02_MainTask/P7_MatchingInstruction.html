@@ -4,6 +4,16 @@
 {# --- 共通CSS/JSの読み込み --- #}
 {% block styles %}
   <link rel="stylesheet" href="{% static 'common.css' %}">
+  <style>
+    .content-area h4 {
+        font-size: 1.1em;
+        color: #000000;
+        margin-top: 24px;
+        margin-bottom: 8px;
+        border-left: 4px solid #3B95C4;
+        padding-left: 8px;
+    }
+  </style>
 {% endblock %}
 
 {% block scripts %}
@@ -12,7 +22,7 @@
 
 {# --- ページのタイトル --- #}
 {% block title %}
-  実験の概要①
+  お返しゲーム説明
 {% endblock %}
 
 {# --- ページのメインコンテンツ --- #}
@@ -26,37 +36,29 @@
   </svg>
 
   <div class="experiment-container">
-  
-    <div class="progress-tabs">
-      <div class="tab-button active" id="tab-role2">あなたの進捗</div>
-      <div class="tab-button" id="tab-role1">他メンバーの進捗</div>
-    </div>
     
+    <div class="progress-tabs">
+      <div class="tab-button active">実験の進捗</div>
+    </div>
+
     <div class="progress-content">
       <div class="progress-steps active" id="steps-role2">
         <div class="step completed"><div class="step-number">1</div>同意取得</div>
         <div class="step completed"><div class="step-number">2</div>実験概要説明</div>
-        <div class="step current"><div class="step-number">3</div>タスク１説明</div>
-        <div class="step"><div class="step-number">4</div>信頼ゲーム</div>
-        <div class="step"><div class="step-number">5</div>アンケート</div>
-        <div class="step"><div class="step-number">6</div>報酬の確認</div>
-      </div>
-      <div class="progress-steps" id="steps-role1">
-        <div class="step completed"><div class="step-number">1</div>同意取得</div>
-        <div class="step completed"><div class="step-number">2</div>実験概要説明</div>
-        <div class="step current"><div class="step-number">3</div>タスク１説明</div>
-        <div class="step"><div class="step-number">4</div>待機</div>
+        <div class="step completed"><div class="step-number">3</div>お返しゲーム説明</div>
+        <div class="step current"><div class="step-number">4</div>タスク２説明</div>
         <div class="step"><div class="step-number">5</div>アンケート</div>
         <div class="step"><div class="step-number">6</div>報酬の確認</div>
       </div>
     </div>
     
     <div class="experiment-header">
+      
       <div class="room-tabs">
         <div>作業ルーム1</div>
         <div>作業ルーム2</div>
-        <div class="active">全体ルーム</div> 
-      </div>
+        <div class="active">全体ルーム</div> </div>
+      
       <div class="header-right-panel">
         <button type="button" class="rule-check-button" id="open-rules-modal">
           ルールを確認する
@@ -71,41 +73,42 @@
     </div>
     
     <div class="content-area">
-      <h2 id="page-title">タスク２：贈り物ゲーム</h2>
+      <h2 id="page-title">説明</h2>
 
       <p>
-        このページでは、メッセージ作成のルールを説明します。
+        これからステージ１の本番を始めます。<br>
+        ステージ１ではお返しゲームを、２人とそれぞれ２回行ってもらいます。<br>
       </p>
 
       <div class="rule-box">
-        <h3>【メッセージのルール】</h3>
+        <h3>【注意点】</h3>
+        <ul>
+          <li>２回のうち、それぞれ自分が贈り物を贈る側、自分が返礼する側を１回ずつ行います。</li>
+          <li>自分が最初にどちらの側を担うのかはランダムです。</li>
+        </ul>
         <p>
-          役割１の人たちは役割２の人にメッセージを送ることができます。<br>
-          役割１の人たちが作成したメッセージは、<strong>ランダムに１通だけ</strong>役割２の人へ届けられます。
-        </p>
-        <p>
-          役割１の人たちは、以下のような型に従ってメッセージを作成します。
-        <div class="gossip-illustrator">
-          <div class="profile-card" id="gossip-sender-card">
-             <div class="icon icon-null"><svg><use xlink:href="#icon-person"></use></svg></div>
-            <span class="name" id="gossip-sender-name">練習相手</span>
-          </div>
-          <div class="speech-bubble" id="gossip-content">
-           「○○さんは 贈り物ゲームで 約 x pt を分配しました」
-          </div>
-        </div>
+          ステージ１では、1000pt のやり取りでしたが、ステージ２では異なります。<br>
+          ステージ２では、自分の優先順位に従ってやり取りするポイントが大きく異なります。<br>
+          <strong>どうすれば多くのポイントを獲得できるのかを良く考えるようにしてください。</strong><br>
+        <p>【やり取りするポイント】
+          <ul>
+            <li>１位：2000pt</li>
+            <li>２位：1500pt</li>
+            <li>３位：500pt</li>
+            <li>４位：100pt</li>
+          </ul>  
+        </p>  
       </div>
     
+      <p>
+        それでは実際にステージ１：お返しゲームを始めていきましょう。
+      </p>
     </div>
     
     <div class="navigation-footer">
       {% next_button %}
     </div>
 
-  </div>
-  
-  <div class="experiment-footer">
-    <a id="quit-link">実験への参加を中断する</a>
   </div>
 
   <div class="modal-overlay" id="rules-modal">

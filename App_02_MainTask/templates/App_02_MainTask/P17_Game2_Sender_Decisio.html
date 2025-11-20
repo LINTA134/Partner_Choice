@@ -1,0 +1,120 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+  <style>
+    .sim-card {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 24px; margin-bottom: 24px; text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .profile-row { display: flex; justify-content: center; align-items: center; gap: 32px; margin-bottom: 24px; }
+    .arrow { font-size: 2em; color: #aaa; }
+    .btn-disabled-custom {
+      background-color: #ccc !important; cursor: not-allowed; border-color: #bbb !important;
+    }
+  </style>
+{% endblock %}
+
+{% block title %}お返しゲーム (1/2){% endblock %}
+
+{% block content %}
+  <div class="experiment-container">
+    <div class="content-area">
+      
+      <h2>お返しゲーム：あなたの贈り物</h2>
+      
+      <div class="profile-row">
+        <div class="profile-card">
+          <div class="icon icon-user"><svg><use xlink:href="#icon-person"></use></svg></div>
+          <span class="name">あなた</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="profile-card">
+          <div class="icon {{ bot.icon_class }}"><svg><use xlink:href="#icon-person"></use></svg></div>
+          <span class="name">{{ bot.name }}</span>
+        </div>
+      </div>
+
+      <div class="sim-card">
+         <p>
+           あなたの手番です。<br>
+           {{ bot.name }}にいくら贈るか決めてください。
+         </p>
+         <hr style="margin: 16px 0; border:0; border-top:1px dashed #ccc;">
+
+         <p>所持金: {{ initial_endowment }} pt</p>
+         
+         <div style="background:#f9f9f9; padding:16px; border-radius:8px; text-align:left; border:1px solid #eee;">
+           <label style="font-weight:bold;">贈り物の額:</label>
+           <div class="slider-container" style="display:flex; align-items:center; gap:12px; margin-top:8px;">
+              <span>0</span>
+              <input type="range" id="gift-slider" name="g2_gift" min="0" max="{{ initial_endowment }}" value="500" style="flex:1;">
+              <span style="font-weight:bold; width:60px; text-align:right; color:#3B95C4;" id="gift-display">500</span> pt
+           </div>
+         </div>
+         
+         <p style="font-size:0.9em; color:#666; margin-top:8px;">
+           (相手には <span id="bot-receive-preview" style="font-weight:bold;">1500</span> pt 届きます)
+         </p>
+
+         <p style="font-size:0.9em; color:#d9534f; margin-top:16px;">
+            ※ <strong>30秒間</strong> は考えを整理する時間として、決定ボタンが押せません。
+         </p>
+      </div>
+
+      <div class="navigation-footer">
+        <p id="msg-wait-user" style="font-weight:bold; color:#d9534f; margin-bottom:8px;">
+          熟考時間：残り <span id="timer-user">20</span> 秒
+        </p>
+        <button class="btn btn-primary btn-disabled-custom" id="btn-submit" disabled>
+          決定して次へ
+        </button>
+      </div>
+
+    </div>
+  </div>
+  
+  <svg class="icon-svg" style="display:none;">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    const MULTIPLIER = {{ multiplier }};
+    const THINK_TIME = 30;
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const slider = document.getElementById('gift-slider');
+      const display = document.getElementById('gift-display');
+      const preview = document.getElementById('bot-receive-preview');
+      const timerUser = document.getElementById('timer-user');
+      const msgWaitUser = document.getElementById('msg-wait-user');
+      const btnSubmit = document.getElementById('btn-submit');
+
+      // スライダー連動
+      slider.addEventListener('input', () => {
+        const val = parseInt(slider.value);
+        display.textContent = val;
+        preview.textContent = val * MULTIPLIER;
+      });
+
+      // ユーザー熟考タイマー
+      let timeUser = THINK_TIME;
+      const intervalUser = setInterval(() => {
+        timeUser--;
+        timerUser.textContent = timeUser;
+        if (timeUser <= 0) {
+          clearInterval(intervalUser);
+          btnSubmit.disabled = false;
+          btnSubmit.classList.remove('btn-disabled-custom');
+          msgWaitUser.style.display = 'none';
+        }
+      }, 1000);
+    });
+  </script>
+{% endblock %}

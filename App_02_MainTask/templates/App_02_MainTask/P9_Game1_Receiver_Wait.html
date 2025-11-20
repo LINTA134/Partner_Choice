@@ -1,0 +1,69 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+  <style>
+    /* タイマーバーを隠す場合 */
+    .otree-timer { display: none; }
+    
+    .status-message {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #333;
+      margin: 24px 0;
+    }
+    .sim-card {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 48px 24px; margin-bottom: 24px; text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .profile-row { display: flex; justify-content: center; align-items: center; gap: 32px; margin-bottom: 24px; }
+    .arrow { font-size: 2em; color: #aaa; }
+    .loader {
+      border: 5px solid #f3f3f3; border-top: 5px solid #3B95C4; border-radius: 50%;
+      width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 24px auto;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+{% endblock %}
+
+{% block title %}お返しゲーム (1/4){% endblock %}
+
+{% block content %}
+  <div class="experiment-container">
+    <div class="content-area">
+      <h2>お返しゲーム：相手からの贈り物</h2>
+      
+      <div class="profile-row">
+        <div class="profile-card">
+          <div class="icon {{ bot.icon_class }}"><svg><use xlink:href="#icon-person"></use></svg></div>
+          <span class="name">{{ bot.name }}</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="profile-card">
+          <div class="icon icon-user"><svg><use xlink:href="#icon-person"></use></svg></div>
+          <span class="name">あなた</span>
+        </div>
+      </div>
+
+      <div class="sim-card" style="background-color: #F9F9F9;">
+        <div class="loader"></div>
+        <p class="status-message">
+          {{ bot.name }}が贈り物の額を決めています...<br>
+        </p>
+        <p style="color:#666;">
+           しばらくお待ちください。<br>
+           (相手が決定すると自動的に画面が切り替わります)
+        </p>
+      </div>
+
+    </div>
+  </div>
+  
+  <svg class="icon-svg" style="display:none;">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+{% endblock %}

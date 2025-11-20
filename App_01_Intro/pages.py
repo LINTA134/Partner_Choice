@@ -20,8 +20,8 @@ class P1_Consent(Page):
 # ----------------------------------------
 class P2_MatchingWait(Page):
     # 5秒間、自動でこのページに留まらせる (演出のため)
-    timeout_seconds = 3 
-    show_countdown = False
+    timeout_seconds = 3
+    timer_text = "相手が決定するまでお待ちください"
 
     # 同意した人だけ表示 (同意しなかった人はこのAppの以降のページをすべてスキップ)
     def is_displayed(self):
@@ -57,6 +57,8 @@ class P6_GamePractice(Page):
         return {
             'multiplier_percent': int(Constants.MULTIPLIER * 100)
         }
+    def is_displayed(self):
+        return self.participant.vars.get('consent_rejected') is None
 
 # ----------------------------------------
 # ページ遷移の定義

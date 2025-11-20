@@ -1,0 +1,62 @@
+{% extends "otree/Page.html" %}
+{% load staticfiles %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'common.css' %}">
+  <style>
+    .sim-card {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 24px; margin-bottom: 24px; text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .result-highlight { color: #3B95C4; font-weight: bold; font-size: 1.4em; }
+    .profile-row { display: flex; justify-content: center; align-items: center; gap: 32px; margin-bottom: 24px; }
+    .arrow { font-size: 2em; color: #aaa; }
+  </style>
+{% endblock %}
+
+{% block title %}お返しゲーム (1/2){% endblock %}
+
+{% block content %}
+  <div class="experiment-container">
+    <div class="content-area">
+      <h2>お返しゲーム：結果</h2>
+      
+      <div class="profile-row">
+        <div class="profile-card">
+          <div class="icon icon-user"><svg><use xlink:href="#icon-person"></use></svg></div>
+          <span class="name">あなた</span>
+        </div>
+        <div class="arrow">←</div>
+        <div class="profile-card">
+          <div class="icon {{ bot.icon_class }}"><svg><use xlink:href="#icon-person"></use></svg></div>
+          <span class="name">{{ bot.name }}</span>
+        </div>
+      </div>
+
+      <div class="sim-card">
+        <h3>結果</h3>
+        <p>
+          あなたの贈り物: <strong>{{ invest }} pt</strong>
+          <br>↓<br>
+          {{ bot.name }}からの返礼: <span class="result-highlight">{{ bot_return }} pt</span> / {{ bot_recieved }} pt
+        </p>
+        <hr style="margin:16px 0; border:0; border-top:1px solid #eee;">
+        <p>
+          あなたの最終利得: <span class="result-highlight">{{ final_gain }} pt</span>
+        </p>
+      </div>
+
+      <div class="navigation-footer">
+        <button class="btn btn-primary">次へ</button>
+      </div>
+
+    </div>
+  </div>
+  
+  <svg class="icon-svg" style="display:none;">
+    <symbol id="icon-person" viewBox="0 0 24 24">
+      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    </symbol>
+  </svg>
+{% endblock %}
