@@ -1,5 +1,5 @@
 {% extends "otree/Page.html" %}
-{% load staticfiles %}
+{% load static %}
 
 {# --- 共通CSS/JSの読み込み --- #}
 {% block styles %}
@@ -74,38 +74,56 @@
     
     <div class="content-area">
       <h2 id="page-title">お返しゲーム</h2>
-
       <p>
-        お返しゲームは相手と協力するのかを考えながら、<strong>多くのポイントを獲得する</strong>ことを目指すゲームです。
-        このゲームでは、プレイヤーは贈り物を贈る人と、贈り物を返礼する人に分かれてプレイします。
+        この実験で、あなたたちはお返しゲームという２人で行うゲームをプレイしてもらいます。<br>
+        ゲームで獲得した<strong>ポイントに応じて報酬</strong>を追加で支払います。<br>
+        このページでは、お返しゲームのルールを説明します。
       </p>
 
       <div class="rule-box">
         <h3>【お返しゲームのルール】</h3>
+        <h4>ステップ１</h4>
         <p>
-          ゲームは二人一組で行われます。<br>
-          ゲームが始まるごとにプレイヤーは 1000pt を渡されます。
-          <p>
-        <p><h4>ステップ１</h4>
-          贈り物を渡す側の人は、渡された1000ポイントのうち相手に何ポイント贈るのかを決めます。<br>
-          <strong>ポイントは３倍になって</strong>お返しをする人に届きます。
+          ゲームが始まるごとにAさんにポイントが渡されます。
         </p>
+        <div class="rule-image-container">
+          <img src="{% static 'images/TrustGame_step1.svg' %}" alt="説明テキスト">
+        </div>
 
-        <p><h4>ステップ２</h4>
-          お返しをする人は、３倍になったポイントから<strong>相手にいくら返礼するのか</strong>を決めます。<br>
+        <h4>ステップ２</h4>
+        <p>
+          Aさんは、渡されたポイントのうち相手(B)に何ポイント贈るのかを決めます。<br>
+          <strong>相手に贈らなかったポイントは自身のものになります。</strong>
+        </p>
+        <div class="rule-image-container">
+          <img src="{% static 'images/TrustGame_step2.svg' %}" alt="説明テキスト">
+        </div>
+
+        <h4>ステップ３</h4>
+        <p>
+          Aさんのポイントは<strong>３倍になって</strong>相手(B)に届きます。
+        </p>
+        <div class="rule-image-container">
+          <img src="{% static 'images/TrustGame_step3.svg' %}" alt="説明テキスト">
+        </div>
+
+        <h4>ステップ４</h4>
+        <p>
+          Bさんは相手(A)にいくら贈るのかを決めます。<br>
           相手に贈らなかったポイントは自身のものになります。
         </p>
+        <div class="rule-image-container">
+          <img src="{% static 'images/TrustGame_step4.svg' %}" alt="説明テキスト">
+        </div>
 
-        <p><h4>贈る人のポイント</h4>
-          贈り物を渡す人は、相手が贈り物をきちんと返礼する人なのかを判断しなければなりません。<br>
-          贈り物をきちんと返礼する人ならば、多くのポイントを贈り相手が返礼することで、互いに多くのポイントを獲得することができます。<br>
-          つまり、相手が信頼できる人ならば、その人と<strong>協力すれば多くのポイント</strong>を獲得することができます。
+        <h4>ステップ５</h4>
+        <p>
+          結果が決まります。
         </p>
-        <p><h4>返礼する人のポイント</h4>
-          返礼する人は、贈られてきたポイントをすべて自分のものにすることで、ポイントを多く稼げます。<br>
-          ただし相手に協力しなければ<strong>その人からは信頼されなくなります</strong>。
+        <div class="rule-image-container">
+          <img src="{% static 'images/TrustGame_step5.svg' %}" alt="説明テキスト">
+        </div>
       </div>
-    
       <p>
         それでは実際にお返しゲームを練習してみましょう。
       </p>
